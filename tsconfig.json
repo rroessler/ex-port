@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+
+        "noImplicitAny": true,
+        "noImplicitOverride": true,
+
+        "rootDir": "lib",
+        "outDir": "dist",
+        "declaration": true,
+        "declarationDir": "typings"
+    },
+
+    "include": ["lib"],
+    "exclude": ["dist", "node_modules"]
+}
