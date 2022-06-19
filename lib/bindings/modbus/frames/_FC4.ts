@@ -34,7 +34,7 @@ export namespace FC4 {
      ************/
 
     /** `FC4` Implementation. */
-    export class Frame<K extends Direction> extends Generic<'input-registers', K> {
+    export class Frame<K extends Direction> extends Generic<'read-input-registers', K> {
         /**
          * Constructs a FC4 frame with the given arguments.
          * @param kind                      Frame Direction.
@@ -42,7 +42,7 @@ export namespace FC4 {
          */
         constructor(kind: K, public readonly args: IReadInputRegisters[K]) {
             // inherit from the base generic frame
-            super((kind === 'request' ? new Request() : new Response()) as any, 'input-registers', kind);
+            super((kind === 'request' ? new Request() : new Response()) as any, 'read-input-registers', kind);
         }
     }
 

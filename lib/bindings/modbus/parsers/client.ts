@@ -14,6 +14,8 @@ import { Protocol } from '../protocol';
 
 /** Client Parser Interface. */
 export interface IClient extends Parser.Abstract<Protocol.Full> {
+    readonly protocol: string;
+
     target(): number;
     target(next: number): number;
 }
@@ -23,7 +25,7 @@ export interface IClient extends Parser.Abstract<Protocol.Full> {
  *****************/
 
 /** Default Client Parser. */
-export abstract class Client extends Parser.Abstract<Protocol.Full> {
+export abstract class Client extends Parser.Abstract<Protocol.Full> implements IClient {
     /*****************
      *  CONSTRUCTOR  *
      *****************/

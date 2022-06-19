@@ -200,6 +200,11 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
         });
     }
 
+    /** Coordinates flushing the port instance. */
+    flush() {
+        return new Promise<void>((resolve) => this.m_port.flush(() => resolve()));
+    }
+
     /**
      * Coordinates updating various port-options.
      * @param opts                              Options to update.

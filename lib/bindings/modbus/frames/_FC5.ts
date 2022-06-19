@@ -33,7 +33,7 @@ export namespace FC5 {
      ************/
 
     /** `FC5` Implementation. */
-    export class Frame<K extends Direction> extends Generic<'single-coil', K> {
+    export class Frame<K extends Direction> extends Generic<'write-single-coil', K> {
         /**
          * Constructs a FC5 frame with the given arguments.
          * @param kind                      Frame Direction.
@@ -41,7 +41,7 @@ export namespace FC5 {
          */
         constructor(kind: K, public readonly args: IWriteSingleCoil[K]) {
             // inherit from the base generic frame
-            super((kind === 'request' ? new Request() : new Response()) as any, 'single-coil', kind);
+            super((kind === 'request' ? new Request() : new Response()) as any, 'write-single-coil', kind);
         }
     }
 

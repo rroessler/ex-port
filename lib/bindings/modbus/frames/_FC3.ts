@@ -34,7 +34,7 @@ export namespace FC3 {
      ************/
 
     /** `FC3` Implementation. */
-    export class Frame<K extends Direction> extends Generic<'holding-registers', K> {
+    export class Frame<K extends Direction> extends Generic<'read-holding-registers', K> {
         /**
          * Constructs a FC3 frame with the given arguments.
          * @param kind                      Frame Direction.
@@ -42,7 +42,7 @@ export namespace FC3 {
          */
         constructor(kind: K, public readonly args: IReadHoldingRegisters[K]) {
             // inherit from the base generic frame
-            super((kind === 'request' ? new Request() : new Response()) as any, 'holding-registers', kind);
+            super((kind === 'request' ? new Request() : new Response()) as any, 'read-holding-registers', kind);
         }
     }
 

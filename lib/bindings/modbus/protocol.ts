@@ -16,8 +16,8 @@ export namespace Protocol {
 
     /** Incoming Modbus Data. */
     export interface Incoming {
-        response: Data<'response'>;
         target: number;
+        response: Data<'response'>;
     }
 
     /** Modbus Round-Trip Protocol. */

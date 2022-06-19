@@ -34,7 +34,7 @@ export namespace FC15 {
      ************/
 
     /** `FC15` Implementation. */
-    export class Frame<K extends Direction> extends Generic<'multiple-coils', K> {
+    export class Frame<K extends Direction> extends Generic<'write-multiple-coils', K> {
         /**
          * Constructs a FC15 frame with the given arguments.
          * @param kind                      Frame Direction.
@@ -42,7 +42,7 @@ export namespace FC15 {
          */
         constructor(kind: K, public readonly args: IWriteMultipleCoils[K]) {
             // inherit from the base generic frame
-            super((kind === 'request' ? new Request() : new Response()) as any, 'multiple-coils', kind);
+            super((kind === 'request' ? new Request() : new Response()) as any, 'write-multiple-coils', kind);
         }
     }
 

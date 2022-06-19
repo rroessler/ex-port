@@ -35,7 +35,7 @@ export namespace FC2 {
      ************/
 
     /** `FC2` Implementation. */
-    export class Frame<K extends Direction> extends Generic<'discrete-inputs', K> {
+    export class Frame<K extends Direction> extends Generic<'read-discrete-inputs', K> {
         /**
          * Constructs a FC2 frame with the given arguments.
          * @param kind                      Frame Direction.
@@ -43,7 +43,7 @@ export namespace FC2 {
          */
         constructor(kind: K, public readonly args: IReadDiscreteInputs[K]) {
             // inherit from the base generic frame
-            super((kind === 'request' ? new Request() : new Response()) as any, 'discrete-inputs', kind);
+            super((kind === 'request' ? new Request() : new Response()) as any, 'read-discrete-inputs', kind);
         }
     }
 

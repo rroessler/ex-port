@@ -34,7 +34,7 @@ export namespace FC6 {
      ************/
 
     /** `FC6` Implementation. */
-    export class Frame<K extends Direction> extends Generic<'single-register', K> {
+    export class Frame<K extends Direction> extends Generic<'write-single-register', K> {
         /**
          * Constructs a FC6 frame with the given arguments.
          * @param kind                      Frame Direction.
@@ -42,7 +42,7 @@ export namespace FC6 {
          */
         constructor(kind: K, public readonly args: IWriteSingleRegister[K]) {
             // inherit from the base generic frame
-            super((kind === 'request' ? new Request() : new Response()) as any, 'single-register', kind);
+            super((kind === 'request' ? new Request() : new Response()) as any, 'write-single-register', kind);
         }
     }
 

@@ -34,7 +34,7 @@ export namespace FC16 {
      ************/
 
     /** `FC16` Implementation. */
-    export class Frame<K extends Direction> extends Generic<'multiple-registers', K> {
+    export class Frame<K extends Direction> extends Generic<'write-multiple-registers', K> {
         /**
          * Constructs a FC16 frame with the given arguments.
          * @param kind                      Frame Direction.
@@ -42,7 +42,7 @@ export namespace FC16 {
          */
         constructor(kind: K, public readonly args: IWriteMultipleRegisters[K]) {
             // inherit from the base generic frame
-            super((kind === 'request' ? new Request() : new Response()) as any, 'multiple-registers', kind);
+            super((kind === 'request' ? new Request() : new Response()) as any, 'write-multiple-registers', kind);
         }
     }
 

@@ -5,9 +5,10 @@
     "main": "dist/index.js",
     "types": "typings/index.d.ts",
     "scripts": {
-        "dist": "tsc",
+        "dist": "npm run clean && tsc",
         "test": "ava",
-        "cover": "nyc npm run test"
+        "cover": "nyc npm run test",
+        "clean": "rimraf dist typings"
     },
     "keywords": [],
     "author": "Reuben Roessler",

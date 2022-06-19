@@ -35,7 +35,7 @@ export namespace FC1 {
      ************/
 
     /** `FC1` Implementation. */
-    export class Frame<K extends Direction> extends Generic<'coils', K> {
+    export class Frame<K extends Direction> extends Generic<'read-coils', K> {
         /**
          * Constructs a FC1 frame with the given arguments.
          * @param kind                      Frame Direction.
@@ -43,7 +43,7 @@ export namespace FC1 {
          */
         constructor(kind: K, public readonly args: IReadCoils[K]) {
             // inherit from the base generic frame
-            super((kind === 'request' ? new Request() : new Response()) as any, 'coils', kind);
+            super((kind === 'request' ? new Request() : new Response()) as any, 'read-coils', kind);
         }
     }
 

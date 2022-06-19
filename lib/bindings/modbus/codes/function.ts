@@ -10,12 +10,6 @@ export namespace FC {
     /** All Function Code Names. */
     export type Name = keyof typeof _names_impl;
 
-    /** Readable Function Code Names. */
-    export type Readable = Exclude<Name, `${'single' | 'multiple'}-${string}`>;
-
-    /** Writable Function Code Names. */
-    export type Writable = Exclude<Name, Readable>;
-
     /****************
      *  PROPERTIES  *
      ****************/
@@ -23,14 +17,14 @@ export namespace FC {
     /// Available Function Code Names.
     const _names_impl = {
         exception: -1,
-        coils: 1,
-        'discrete-inputs': 2,
-        'holding-registers': 3,
-        'input-registers': 4,
-        'single-coil': 5,
-        'single-register': 6,
-        'multiple-coils': 15,
-        'multiple-registers': 16,
+        'read-coils': 1,
+        'read-discrete-inputs': 2,
+        'read-holding-registers': 3,
+        'read-input-registers': 4,
+        'write-single-coil': 5,
+        'write-single-register': 6,
+        'write-multiple-coils': 15,
+        'write-multiple-registers': 16,
     } as const;
 
     /********************

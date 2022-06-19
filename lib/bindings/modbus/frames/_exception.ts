@@ -24,11 +24,20 @@ export namespace Exception {
         /**
          * Constructs an Exception frame with the given arguments.
          * @param kind                      Frame Direction.
-         * @param args                      Arguments to Encode.
+         * @param ecode                     Error Code.
          */
         constructor(kind: K, public readonly ecode: EC.Value) {
             // inherit from the base generic frame
             super((kind === 'request' ? new Request() : new Response()) as any, 'exception', kind);
+        }
+
+        /********************
+         *  PUBLIC METHODS  *
+         ********************/
+
+        /** Gets the associated error reason. */
+        reason() {
+            return EC.reason(this.ecode);
         }
     }
 
