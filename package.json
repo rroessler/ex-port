@@ -11,9 +11,25 @@
         "cover": "nyc npm run test",
         "clean": "rimraf dist typings"
     },
-    "keywords": [],
+    "keywords": [
+        "abstraction",
+        "COM",
+        "COM port",
+        "modbus",
+        "port",
+        "serial",
+        "serialport",
+        "serial port",
+        "stream",
+        "tty",
+        "typescript"
+    ],
     "author": "Reuben Roessler",
     "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/rroessler/ex-port.git"
+    },
     "devDependencies": {
         "@types/node": "^18.0.0",
         "@types/sinon": "^10.0.11",
