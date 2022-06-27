@@ -4,6 +4,10 @@
     "description": "Extensible Serial-Port Implementations",
     "main": "dist/index.js",
     "types": "typings/index.d.ts",
+    "files": [
+        "dist/**/*",
+        "typings/**/*"
+    ],
     "scripts": {
         "prepublishOnly": "npm run dist",
         "dist": "npm run clean && tsc",
