@@ -2,7 +2,7 @@
 import test from 'ava';
 import sinon from 'sinon';
 
-/// Portex Modules
+/// Ext-Port Modules
 import { Delimiter } from '..';
 
 test('Parser::Delimiter | Transform data by a pre-defined delimiter', (t) => {

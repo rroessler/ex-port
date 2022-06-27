@@ -1,4 +1,4 @@
-# Ex-Port
+# Ext-Port
 
 An extensible framework for working with Serial-Ports that required explicitly defined protocols. Also exposes minimal well-known protocols such as Modbus.
 
@@ -8,12 +8,12 @@ An extensible framework for working with Serial-Ports that required explicitly d
 ## Installation
 
 ```bash
-npm install ex-port
+npm install ext-port
 ```
 
 ## Port Framework
 
-As a wrapper utility, `ex-port` allows defining explicit protocols for a chosen serial-port. This can be done by defining a `protocol` and an optional `parser`. This package exposes varying avenues to do this (such as be regular inheritance or interface agreements). The definitions of these for `ex-port` are as follows:
+As a wrapper utility, `ext-port` allows defining explicit protocols for a chosen serial-port. This can be done by defining a `protocol` and an optional `parser`. This package exposes varying avenues to do this (such as be regular inheritance or interface agreements). The definitions of these for `ext-port` are as follows:
 
 > Protocol **>** Type of *`incoming`* and *`outgoing`* data. These will be defined as `<IN>:<OUT>`.
 
@@ -21,14 +21,14 @@ As a wrapper utility, `ex-port` allows defining explicit protocols for a chosen 
 
 ### Default Port
 
-By default, any `ex.Port` will use the underlying protocol of `<Buffer>:<Buffer>` with no parser transformation.
+By default, any `ext.Port` will use the underlying protocol of `<Buffer>:<Buffer>` with no parser transformation.
 
 ```typescript
 /// Importing (all exports also exposed as non-default)
-import ex from 'ex-port';
+import ext from 'ext-port';
 
 /// Port Construction
-const port = new ex.Port({ path: '/dev/ROBOT', baudRate: 38400 });
+const port = new ext.Port({ path: '/dev/ROBOT', baudRate: 38400 });
 ```
 
 Both the `path` and `baudRate` options are required and the port does not open by default when constructed.
@@ -38,7 +38,8 @@ Both the `path` and `baudRate` options are required and the port does not open b
 A protocol can be defined in one of two ways, through the `Duplex` generic, or from extending the `Any` protocol. These typings are initially transient until a coinciding `parser` is also defined.
 
 ```typescript
-import type { Protocol } from 'ex-port';
+import type { Protocol } from 'ext-port';
+import ext from 'ext-port';
 
 /// Generic
 type MyProtocol = Protocol.Duplex<string, [string]>;
@@ -49,19 +50,19 @@ interface IMyProtocol extends Protocol.Any {
     outgoing: [string];
 }
 
-/// Usage on `ex.Port`
-const port = new ex.Port<MyProtocol>({ /** ... */ });
+/// Usage on `ext.Port`
+const port = new ext.Port<MyProtocol>({ /** ... */ });
 ```
 
 **Note:** The outgoing definition is required to be in an array format. The reason for this is to allow for multiple arguments to the exposed `write` command for port instances.
 
 ### Parser Declaration
 
-Since protocols are inherently transient due to be type-casts only, a `parser` (and `codec` if extending from the `ex-port` library) is required to convert incoming and outgoing data.
+Since protocols are inherently transient due to be type-casts only, a `parser` (and `codec` if extending from the `ext-port` library) is required to convert incoming and outgoing data.
 
 Some examples for parsers can be seen in the `lib/parser/impl` directory, alongside additional `codec` examples in the `lib/codec/impl` directory.
 
-**Note:** SerialPort.io parsers can be used interchangeable with this library. To do this, the `ex.Parser.Abstract` parent, directly inherits from a `Transform` in the same manner that the other parsers do, however adds improved functionality with Monadic style result handling.
+**Note:** SerialPort.io parsers can be used interchangeable with this library. To do this, the `ext.Parser.Abstract` parent, directly inherits from a `Transform` in the same manner that the other parsers do, however adds improved functionality with Monadic style result handling.
 
 ### Port Properties
 
@@ -77,8 +78,8 @@ Most methods return a monadic result instead of required a designated callback h
 **`open`** &ndash; Opens a port instance. Returns a promisified monadic result.
 
 ```typescript
-import ex from 'ex-port';
-const port = new ex.Port({ path: '/dev/ROBOT', baudRate: 115200 });
+import ext from 'ext-port';
+const port = new ext.Port({ path: '/dev/ROBOT', baudRate: 115200 });
 const result = await port.open();
 
 if (result.is('error')) /** Handle Error ... */
@@ -120,8 +121,8 @@ port.once('close', (disconnected: boolean) => /** Close event handler. */);
 port.on('incoming', (incoming: any) => /** Decoded incoming event handler. */);
 port.on('outgoing', (buffer: Buffer) => /** Encoded outgoing event handler. */);
 
-port.on('_error', (error: ex.IPortError) => /** Error event handler. */);
-port.on('_warning', (warning: ex.IPortWarning) => /** Warning event handler. */);
+port.on('_error', (error: ext.IPortError) => /** Error event handler. */);
+port.on('_warning', (warning: ext.IPortWarning) => /** Warning event handler. */);
 ```
 
 **Note:** Both items return `bigint` keys that can be used to later remove the associated events.

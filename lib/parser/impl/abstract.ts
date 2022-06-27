@@ -1,6 +1,6 @@
 import { Transform, TransformCallback, TransformOptions } from 'stream';
 
-/// Portex Modules
+/// Ext-Port Modules
 import { Codec } from '../../codec';
 import { Maybe } from '../../utils/maybe';
 import { Protocol } from '../../codec/protocol';

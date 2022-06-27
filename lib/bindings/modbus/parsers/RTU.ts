@@ -1,10 +1,10 @@
 /// Native Modules
 import { TransformOptions } from 'stream';
 
-/// Portex Utils
+/// Ext-Port Utils
 import { Maybe } from '../../../utils/maybe';
 
-/// Portex Imports
+/// Ext-Port Imports
 import { Codec } from '../../../codec';
 import { Protocol } from '../protocol';
 import { CRC } from '../../../checksum';

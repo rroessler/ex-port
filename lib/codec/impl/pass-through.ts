@@ -1,4 +1,4 @@
-/// Portex Modules
+/// Ext-Port Modules
 import { Maybe } from '../../utils/maybe';
 import { Abstract } from './abstract';
 

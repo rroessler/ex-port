@@ -1,3 +1,3 @@
-# Ex-Port Modbus Implementation
+# Ext-Port Modbus Implementation
 
 WIP...

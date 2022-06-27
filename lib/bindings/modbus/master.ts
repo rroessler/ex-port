@@ -1,8 +1,8 @@
-/// Portex Utils
+/// Ext-Port Utils
 import { Monad } from '../../utils/monad';
 import { Delay } from '../../utils/delay';
 
-/// Portex Imports
+/// Ext-Port Imports
 import { IBarePort, IPortOptions, Port } from '../../port';
 
 /// Modbus Imports

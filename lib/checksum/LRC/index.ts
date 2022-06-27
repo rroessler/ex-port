@@ -1,4 +1,4 @@
-/// Portex Modules
+/// Ext-Port Modules
 import { buffer_t } from '../../stdint';
 
 /** LRC Manipulation. */

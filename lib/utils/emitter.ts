@@ -1,7 +1,7 @@
 /// Native Modules.
 import { EventEmitter } from 'events';
 
-/// Portex Utils.
+/// Ext-Port Utils.
 import { UID } from './uid';
 
 /** Emitter Functionality. */

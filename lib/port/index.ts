@@ -4,11 +4,11 @@ import { CreatePortOptions } from '@serialport/binding-mock';
 import { AutoDetectTypes } from '@serialport/bindings-cpp';
 import { DisconnectedError } from '@serialport/stream';
 
-/// Portex Utils
+/// Ext-Port Utils
 import { Delay } from '../utils/delay';
 import { Emitter } from '../utils/emitter';
 
-/// Portex Modules
+/// Ext-Port Modules
 import { Protocol } from '../codec';
 import { Maybe } from '../utils/maybe';
 import { Monad } from '../utils/monad';
@@ -87,7 +87,7 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
      */
     set parser(next: IParser<P> | null) {
         // ensure the port is not actually open now
-        if (this.m_port.isOpen) throw PortError('Cannot change Portex::Port.parser whilst port is open');
+        if (this.m_port.isOpen) throw PortError('Cannot change ext::Port.parser whilst port is open');
 
         // remove the current parser implementation
         this.m_port.unpipe();
@@ -165,7 +165,7 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
 
             // declare an error if we have an invalid message
             if (outgoing.is('none')) {
-                const message = `Could not write to Portex::Port. ${outgoing.unwrap()}`;
+                const message = `Could not write to ext::Port. ${outgoing.unwrap()}`;
                 this.m_emitter.emit('_error', PortError(message));
                 return resolve(Monad.Error(message));
             }
@@ -179,7 +179,7 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
 
             // ensure we actually have a buffer
             if (!(buffer instanceof Buffer)) {
-                const message = `Could not write to Portex::Port. Outgoing data could not be converted to a buffer`;
+                const message = `Could not write to ext::Port. Outgoing data could not be converted to a buffer`;
                 this.m_emitter.emit('_error', PortError(message));
                 return resolve(Monad.Error(message));
             }
@@ -188,7 +188,7 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
             this.m_port.write(buffer, encoding, (err) => {
                 // handle any errors that may occur
                 if (err) {
-                    const message = `Portex::Port write error. ${err.message}`;
+                    const message = `ext::Port write error. ${err.message}`;
                     this.m_emitter.emit('_error', PortError(message));
                     return resolve(Monad.Error(message));
                 }
@@ -257,7 +257,7 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
 
             // if already in the desired state, then declare a warning
             if (state === current) {
-                const message = `Portex::Port is already ${state === 'close' ? 'closed' : 'open'}`;
+                const message = `ext::Port is already ${state === 'close' ? 'closed' : 'open'}`;
                 this.m_emitter.emit('_warning', PortWarning(message));
                 return resolve(Monad.Error(message));
             }
@@ -265,7 +265,7 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
             // otherwise attempt the required state change
             this.m_port[state]((err) => {
                 if (err) {
-                    const message = `Could not change Portex::Port state. ${err.message}`;
+                    const message = `Could not change ext::Port state. ${err.message}`;
                     this.m_emitter.emit('_error', PortError(message));
                     return resolve(Monad.Error(message));
                 }

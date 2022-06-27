@@ -1,7 +1,7 @@
-/// Portex Utils
+/// Ext-Port Utils
 import { Maybe } from '../../../utils/maybe';
 
-/// Portex Imports
+/// Ext-Port Imports
 import { Codec } from '../../../codec';
 import { bool_t } from '../../../stdint';
 

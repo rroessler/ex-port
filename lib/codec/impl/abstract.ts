@@ -1,7 +1,7 @@
-/// Portex Utils
+/// Ext-Port Utils
 import { Maybe } from '../../utils/maybe';
 
-/// Portex Modules
+/// Ext-Port Modules
 import { Protocol } from '../protocol';
 
 /**************

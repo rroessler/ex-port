@@ -1,4 +1,4 @@
-/// Portex Utils.
+/// Ext-Port Utils.
 import { Exception } from '../../../utils/error';
 
 /** Modbus Error Factory. */

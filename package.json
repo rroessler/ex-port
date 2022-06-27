@@ -1,5 +1,5 @@
 {
-    "name": "ex-port",
+    "name": "ext-port",
     "version": "1.0.0",
     "description": "Extensible Serial-Port Implementations",
     "main": "dist/index.js",
@@ -32,7 +32,7 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "git://github.com/rroessler/ex-port.git"
+        "url": "git://github.com/rroessler/ext-port.git"
     },
     "devDependencies": {
         "@types/node": "^18.0.0",

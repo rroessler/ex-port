@@ -2,7 +2,7 @@
 import { SerialPortOpenOptions } from 'serialport';
 import { AutoDetectTypes } from '@serialport/bindings-cpp';
 
-/// Portex Modules
+/// Ext-Port Modules
 import { Protocol } from '../codec';
 import { IParser } from '../parser/impl';
 

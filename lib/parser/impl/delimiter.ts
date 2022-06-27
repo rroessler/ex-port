@@ -1,7 +1,7 @@
 /// Native Modules
 import { TransformOptions } from 'stream';
 
-/// Portex Imports
+/// Ext-Port Imports
 import { Abstract } from './abstract';
 import { Codec, Protocol } from '../../codec';
 import { Maybe } from '../../utils/maybe';

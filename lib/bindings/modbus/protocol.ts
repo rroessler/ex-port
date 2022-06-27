@@ -1,4 +1,4 @@
-/// Portex Imports
+/// Ext-Port Imports
 import { Protocol as _Protocol_t } from '../../codec/protocol';
 
 /// Modbus Imports

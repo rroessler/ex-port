@@ -1,4 +1,4 @@
-/// Ex-Port Functionality
+/// Ext-Port Functionality
 import * as ex from './_exports';
 
 export * from './_exports';

@@ -2,7 +2,7 @@
 import { Codec } from '../../../codec';
 import { TransformOptions } from 'stream';
 
-/// Portex Imports
+/// Ext-Port Imports
 import { Parser } from '../../../parser';
 
 /// Modbus Imports

@@ -1,9 +1,9 @@
-/// Portex Modules
+/// Ext-Port Modules
 import { Protocol } from '../codec';
 import { Monad } from '../utils/monad';
 import { IPortWarning, IPortError } from './error';
 
-/** Portex Default Port Events. */
+/** Ext-Port Default Port Events. */
 export interface IPortEvents<P extends Protocol.Any> {
     open: []; // null-open
     close: [disconected: boolean]; // null-close

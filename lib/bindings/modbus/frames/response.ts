@@ -1,4 +1,4 @@
-/// Portex Utils
+/// Ext-Port Utils
 import { Maybe } from '../../../utils/maybe';
 
 /// Modbus Utils
