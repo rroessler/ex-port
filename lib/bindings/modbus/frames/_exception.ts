@@ -1,5 +1,5 @@
-/// Ext-Port Utils
-import { Maybe } from '../../../utils/maybe';
+/// Vendor Modules
+import * as Monads from 'ts-monadable';
 
 /// Ext-Port Imports
 import { Codec } from '../../../codec';
@@ -51,11 +51,11 @@ export namespace Exception {
          * Encodes a request frame.
          * @param frame                 Frame to encode.
          */
-        encode(frame: Frame<'request'>): Maybe.IPerhaps<Buffer> {
+        encode(frame: Frame<'request'>): Monads.Maybe<Buffer> {
             const payload = Buffer.alloc(2);
             payload.writeUint8(frame.code, 0);
             payload.writeUint8(frame.ecode, 1);
-            return Maybe.Some(payload);
+            return Monads.Some(payload);
         }
 
         /**
@@ -63,11 +63,11 @@ export namespace Exception {
          * @param buffer                Buffer to attempt decoding.
          * @param encoding              Optional encoding.
          */
-        decode(buffer: Buffer, encoding?: BufferEncoding): Maybe.IPerhaps<Frame<'request'>> {
-            return BufferUtils.safeAccess(Maybe.None(), () => {
+        decode(buffer: Buffer, encoding?: BufferEncoding): Monads.Maybe<Frame<'request'>> {
+            return BufferUtils.safeAccess(Monads.None(), () => {
                 const code = buffer.readUint8(0);
                 if (code > 0x2b) throw ModbusError('Frame::Exception<"request"> decoded an illegal function code');
-                return Maybe.Some(new Frame('request', 0x01));
+                return Monads.Some(new Frame('request', 0x01));
             });
         }
     }
@@ -78,11 +78,11 @@ export namespace Exception {
          * Encodes a request frame.
          * @param frame                 Frame to encode.
          */
-        encode(frame: Frame<'response'>): Maybe.IPerhaps<Buffer> {
+        encode(frame: Frame<'response'>): Monads.Maybe<Buffer> {
             const payload = Buffer.alloc(2);
             payload.writeUint8(frame.code + 0x80, 0);
             payload.writeUint8(frame.ecode, 1);
-            return Maybe.Some(payload);
+            return Monads.Some(payload);
         }
 
         /**
@@ -90,12 +90,12 @@ export namespace Exception {
          * @param buffer                Buffer to attempt decoding.
          * @param encoding              Optional encoding.
          */
-        decode(buffer: Buffer, encoding?: BufferEncoding): Maybe.IPerhaps<Frame<'response'>> {
-            return BufferUtils.safeAccess(Maybe.None(), () => {
+        decode(buffer: Buffer, encoding?: BufferEncoding): Monads.Maybe<Frame<'response'>> {
+            return BufferUtils.safeAccess(Monads.None(), () => {
                 const code = buffer.readUint8(0) - 0x80;
                 const ecode = buffer.readUint8(1);
                 if (code > 0x2b) throw ModbusError('Frame::Exception<"response"> decoded an illegal function code');
-                return Maybe.Some(new Frame('response', ecode as EC.Value));
+                return Monads.Some(new Frame('response', ecode as EC.Value));
             });
         }
     }

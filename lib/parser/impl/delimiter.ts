@@ -1,10 +1,12 @@
 /// Native Modules
 import { TransformOptions } from 'stream';
 
+/// Vendor Modules
+import * as Monads from 'ts-monadable';
+
 /// Ext-Port Imports
 import { Abstract } from './abstract';
 import { Codec, Protocol } from '../../codec';
-import { Maybe } from '../../utils/maybe';
 
 /**************
  *  TYPEDEFS  *
@@ -59,7 +61,7 @@ export class Delimiter extends Abstract {
      * @param chunk                             Chunk to transform.
      * @param encoding                          Chunk encoding.
      */
-    protected override m_transform(chunk: Buffer, encoding: BufferEncoding): Maybe.IPerhaps<Protocol.Incoming[]> {
+    protected override m_transform(chunk: Buffer, encoding: BufferEncoding): Monads.Maybe<Protocol.Incoming[]> {
         const pushable: Buffer[] = [];
         let data = Buffer.concat([this.m_buffer, chunk]);
         let pos: number;
@@ -70,13 +72,13 @@ export class Delimiter extends Abstract {
         }
 
         this.m_buffer = data;
-        return Maybe.Some(pushable);
+        return Monads.Some(pushable);
     }
 
     /** Coordinates flushing any trailing data. */
-    protected override m_flush(): Maybe.IPerhaps<Protocol.Incoming[]> {
+    protected override m_flush(): Monads.Maybe<Protocol.Incoming[]> {
         const pushable = [Buffer.from(this.m_buffer)];
         this.m_buffer = Buffer.alloc(0);
-        return Maybe.Some(pushable);
+        return Monads.Some(pushable);
     }
 }

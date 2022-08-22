@@ -1,5 +1,7 @@
+/// Vendor Modules
+import * as Monads from 'ts-monadable';
+
 /// Ext-Port Utils
-import { Monad } from '../../utils/monad';
 import { Delay } from '../../utils/delay';
 
 /// Ext-Port Imports
@@ -110,7 +112,7 @@ export class Master implements IBarePort, Pick<IClient, 'protocol' | 'target'> {
     async invoke<N extends Exclude<FC.Name, 'exception'>>(
         name: N,
         args: IFrames<'request'>[N]['args']
-    ): Promise<Monad.IResult<IFrames<'response'>[N], IFrames<'response'>['exception']>> {
+    ): Promise<Monads.Result<IFrames<'response'>[N], IFrames<'response'>['exception']>> {
         // generate the required frame to invoke
         const request = new Frames[name]('request', args as any);
         const current = this.target(); // set the current target
@@ -122,13 +124,13 @@ export class Master implements IBarePort, Pick<IClient, 'protocol' | 'target'> {
         await this.port.flush();
 
         // prepare the response promise
-        const promise = new Promise<Monad.IResult<IFrames<'response'>[N], IFrames<'response'>['exception']>>(
+        const promise = new Promise<Monads.Result<IFrames<'response'>[N], IFrames<'response'>['exception']>>(
             (resolve) => {
                 // setup a timer to handler what occurs when the request times-out
                 const timer = setTimeout(() => {
                     this.m_client.removeAllListeners('data'); // remove all previous listeners
                     this.m_outgoing.shift(); // and the current promise
-                    resolve(Monad.Error(new Exception.Frame('response', -1)));
+                    resolve(Monads.Failure(new Exception.Frame('response', -1)));
                 }, this.m_options.timeout);
 
                 // finally prepare the resolution condition
@@ -137,8 +139,8 @@ export class Master implements IBarePort, Pick<IClient, 'protocol' | 'target'> {
                     this.m_outgoing.shift();
 
                     // determine if we have a valid or bad response and resolve accordingly
-                    if (response.name !== 'exception') resolve(Monad.Okay(response as any));
-                    else resolve(Monad.Error(response as Exception.Frame<'response'>));
+                    if (response.name !== 'exception') resolve(Monads.Okay(response as any));
+                    else resolve(Monads.Failure(response as Exception.Frame<'response'>));
                 });
             }
         );

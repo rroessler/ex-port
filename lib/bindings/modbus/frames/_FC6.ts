@@ -1,6 +1,5 @@
-/// Ext-Port Utils
-import { Maybe } from '../../../utils/maybe';
-import { Bytes } from '../../../stdint/bytes';
+/// Vendor Modules
+import * as Monads from 'ts-monadable';
 
 /// Ext-Port Imports
 import { Codec } from '../../../codec';
@@ -56,13 +55,13 @@ export namespace FC6 {
          * Encodes a request frame.
          * @param frame                 Frame to encode.
          */
-        encode(frame: Frame<'request'>): Maybe.IPerhaps<Buffer> {
+        encode(frame: Frame<'request'>): Monads.Maybe<Buffer> {
             const { start, value } = frame.args;
             const payload = Buffer.alloc(5);
             payload.writeUint8(frame.code, 0);
             payload.writeUint16BE(start, 1);
             payload.writeUint16BE(value, 3);
-            return Maybe.Some(payload);
+            return Monads.Some(payload);
         }
 
         /**
@@ -70,13 +69,13 @@ export namespace FC6 {
          * @param buffer                Buffer to attempt decoding.
          * @param encoding              Optional encoding.
          */
-        decode(buffer: Buffer, encoding?: BufferEncoding): Maybe.IPerhaps<Frame<'request'>> {
-            return BufferUtils.safeAccess(Maybe.None(), () => {
+        decode(buffer: Buffer, encoding?: BufferEncoding): Monads.Maybe<Frame<'request'>> {
+            return BufferUtils.safeAccess(Monads.None(), () => {
                 const code = buffer.readUint8(0);
                 const start = buffer.readUint16BE(1);
                 const value = buffer.readUint16BE(3) as uint16_t;
                 Generic.assertCode(code, 6, 'request');
-                return Maybe.Some(new Frame('request', { start, value }));
+                return Monads.Some(new Frame('request', { start, value }));
             });
         }
     }
@@ -87,13 +86,13 @@ export namespace FC6 {
          * Encodes a request frame.
          * @param frame                 Frame to encode.
          */
-        encode(frame: Frame<'response'>): Maybe.IPerhaps<Buffer> {
+        encode(frame: Frame<'response'>): Monads.Maybe<Buffer> {
             const { address, value } = frame.args;
             const payload = Buffer.alloc(5);
             payload.writeUInt8(frame.code, 0);
             payload.writeUint16BE(address, 1);
             payload.writeUint16BE(value, 3);
-            return Maybe.Some(payload);
+            return Monads.Some(payload);
         }
 
         /**
@@ -101,13 +100,13 @@ export namespace FC6 {
          * @param buffer                Buffer to attempt decoding.
          * @param encoding              Optional encoding.
          */
-        decode(buffer: Buffer, encoding?: BufferEncoding): Maybe.IPerhaps<Frame<'response'>> {
-            return BufferUtils.safeAccess(Maybe.None(), () => {
+        decode(buffer: Buffer, encoding?: BufferEncoding): Monads.Maybe<Frame<'response'>> {
+            return BufferUtils.safeAccess(Monads.None(), () => {
                 const code = buffer.readUint8(0);
                 const address = buffer.readUint16BE(1);
                 const value = buffer.readUint16BE(3) as uint16_t;
                 Generic.assertCode(code, 6, 'response');
-                return Maybe.Some(new Frame('response', { address, value }));
+                return Monads.Some(new Frame('response', { address, value }));
             });
         }
     }

@@ -1,8 +1,9 @@
 import { Transform, TransformCallback, TransformOptions } from 'stream';
 
+/// Vendor Modules
+import * as Monads from 'ts-monadable';
 /// Ext-Port Modules
 import { Codec } from '../../codec';
-import { Maybe } from '../../utils/maybe';
 import { Protocol } from '../../codec/protocol';
 
 /**************
@@ -67,8 +68,8 @@ export abstract class Abstract<P extends Protocol.Any = Protocol.Default> extend
      *********************/
 
     /** User-implemented transform method. */
-    protected abstract m_transform(chunk: Buffer, encoding: BufferEncoding): Maybe.IPerhaps<P['incoming'][]>;
+    protected abstract m_transform(chunk: Buffer, encoding: BufferEncoding): Monads.Maybe<P['incoming'][]>;
 
     /** User-implemented flusher. */
-    protected abstract m_flush(): Maybe.IPerhaps<P['incoming'][]>;
+    protected abstract m_flush(): Monads.Maybe<P['incoming'][]>;
 }

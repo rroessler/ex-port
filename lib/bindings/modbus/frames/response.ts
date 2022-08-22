@@ -1,5 +1,5 @@
-/// Ext-Port Utils
-import { Maybe } from '../../../utils/maybe';
+/// Vendor Modules
+import * as Monads from 'ts-monadable';
 
 /// Modbus Utils
 import { BufferUtils } from '../utils/buffer';
@@ -15,8 +15,8 @@ export namespace Response {
      * Attempts reading out a response from a given buffer.
      * @param buffer                    Buffer to generate response from.
      */
-    export const from = (buffer: Buffer): Maybe.IPerhaps<Generic<FC.Name, 'response'>> => {
-        return BufferUtils.safeAccess(Maybe.None(), () => {
+    export const from = (buffer: Buffer): Monads.Maybe<Generic<FC.Name, 'response'>> => {
+        return BufferUtils.safeAccess(Monads.None(), () => {
             // retrieve the base code given
             const code = buffer.readUint8(0);
 
@@ -34,7 +34,7 @@ export namespace Response {
             if (code === 16) return new FC16.Response().decode(buffer);
 
             // otherwise declare an error
-            return Maybe.None();
+            return Monads.None();
         });
     };
 }

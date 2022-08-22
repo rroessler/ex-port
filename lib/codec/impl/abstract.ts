@@ -1,5 +1,5 @@
-/// Ext-Port Utils
-import { Maybe } from '../../utils/maybe';
+/// Vendor Modules
+import * as Monads from 'ts-monadable';
 
 /// Ext-Port Modules
 import { Protocol } from '../protocol';
@@ -11,8 +11,8 @@ import { Protocol } from '../protocol';
 /** Codec Interface Agreement. */
 export interface ICodec<P extends Protocol.Any> {
     readonly encoding: BufferEncoding;
-    encode(...args: P['outgoing']): Maybe.IPerhaps<Buffer>;
-    decode(buffer: Buffer, encoding?: BufferEncoding): Maybe.IPerhaps<P['incoming']>;
+    encode(...args: P['outgoing']): Monads.Maybe<Buffer>;
+    decode(buffer: Buffer, encoding?: BufferEncoding): Monads.Maybe<P['incoming']>;
 }
 
 /** Codec Constructor Type Alias. */
@@ -44,11 +44,11 @@ export abstract class Abstract<P extends Protocol.Any = Protocol.Default> implem
      * Encodes outgoing protocol data to a writable buffer.
      * @param args                          Arguments to encode.
      */
-    abstract encode(...args: P['outgoing']): Maybe.IPerhaps<Buffer>;
+    abstract encode(...args: P['outgoing']): Monads.Maybe<Buffer>;
 
     /**
      * Decodes an incoming serial-buffer.
      * @param buffer                        Buffer to decode.
      */
-    abstract decode(buffer: Buffer, encoding?: BufferEncoding): Maybe.IPerhaps<P['incoming']>;
+    abstract decode(buffer: Buffer, encoding?: BufferEncoding): Monads.Maybe<P['incoming']>;
 }

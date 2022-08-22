@@ -1,5 +1,6 @@
 /// Ext-Port Functionality
-import * as ex from './_exports';
+import * as ext from './_exports';
 
+/// Ext-Port Exports
 export * from './_exports';
-export default ex;
+export default ext;

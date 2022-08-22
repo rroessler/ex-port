@@ -1,5 +1,7 @@
+/// Vendor Modules
+import * as Monads from 'ts-monadable';
+
 /// Ext-Port Modules
-import { Maybe } from '../../utils/maybe';
 import { Abstract } from './abstract';
 
 /** No-Operation Codec. */
@@ -9,12 +11,12 @@ export class PassThrough extends Abstract {
      ********************/
 
     /** No-Operation Encoder. */
-    encode(buffer: Buffer): Maybe.IPerhaps<Buffer> {
-        return Maybe.Some(buffer);
+    encode(buffer: Buffer): Monads.Maybe<Buffer> {
+        return Monads.Some(buffer);
     }
 
     /** No-Operation Decoder. */
-    decode(buffer: Buffer, encoding?: BufferEncoding): Maybe.IPerhaps<Buffer> {
-        return Maybe.Some(buffer);
+    decode(buffer: Buffer, encoding?: BufferEncoding): Monads.Maybe<Buffer> {
+        return Monads.Some(buffer);
     }
 }

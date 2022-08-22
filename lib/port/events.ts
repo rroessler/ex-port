@@ -1,6 +1,5 @@
 /// Ext-Port Modules
 import { Protocol } from '../codec';
-import { Monad } from '../utils/monad';
 import { IPortWarning, IPortError } from './error';
 
 /** Ext-Port Default Port Events. */

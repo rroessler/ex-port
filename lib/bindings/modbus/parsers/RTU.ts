@@ -1,8 +1,8 @@
 /// Native Modules
 import { TransformOptions } from 'stream';
 
-/// Ext-Port Utils
-import { Maybe } from '../../../utils/maybe';
+/// Vendor Modules
+import * as Monads from 'ts-monadable';
 
 /// Ext-Port Imports
 import { Codec } from '../../../codec';
@@ -42,7 +42,7 @@ class _Codec_impl extends Codec.Abstract<Protocol.Full> {
      * @param target                        Target Device.
      * @param frame                         Request Frame to Encode.
      */
-    encode(target: number, frame: Protocol.Data<'request'>): Maybe.IPerhaps<Buffer> {
+    encode(target: number, frame: Protocol.Data<'request'>): Monads.Maybe<Buffer> {
         const request = frame.buffer();
         const payload = Buffer.alloc(request.length + 1);
 
@@ -55,7 +55,7 @@ class _Codec_impl extends Codec.Abstract<Protocol.Full> {
         crc.writeUint16LE(CRC.modbus.fast(payload));
 
         // finally concatenate the resulting message
-        return Maybe.Some(Buffer.concat([payload, crc]));
+        return Monads.Some(Buffer.concat([payload, crc]));
     }
 
     /**
@@ -63,8 +63,8 @@ class _Codec_impl extends Codec.Abstract<Protocol.Full> {
      * @param buffer                        Buffer to decode.
      * @param encoding                      Optional encoding.
      */
-    decode(buffer: Buffer, encoding?: BufferEncoding): Maybe.IPerhaps<Protocol.Incoming> {
-        return BufferUtils.safeAccess(Maybe.None(), () => {
+    decode(buffer: Buffer, encoding?: BufferEncoding): Monads.Maybe<Protocol.Incoming> {
+        return BufferUtils.safeAccess(Monads.None(), () => {
             // ensure the buffer we have is a valid size
             if (buffer.length < 1) throw ModbusError('RTU::decode failed to parse an empty buffer');
 
@@ -74,14 +74,14 @@ class _Codec_impl extends Codec.Abstract<Protocol.Full> {
 
             // generate the required response body
             const result = Response.from(PDU);
-            if (result.is('none')) return Maybe.None();
+            if (result.is('none')) return Monads.None();
 
             // now ensure the CRC is valid against the PDU
             const crc = buffer.readUint16LE(buffer.length - 2);
-            if (CRC.modbus.fast(buffer.slice(0, -2)) !== crc) return Maybe.None();
+            if (CRC.modbus.fast(buffer.slice(0, -2)) !== crc) return Monads.None();
 
             // return the combined result
-            return Maybe.Some({ target, response: result.unwrap() as any });
+            return Monads.Some({ target, response: result.unwrap() as any });
         });
     }
 }
@@ -130,7 +130,7 @@ export class RTU extends Client {
      * @param chunk                     Chunk to transform.
      * @param encoding                  Encoding to transform with.
      */
-    protected m_transform(chunk: Buffer, encoding: BufferEncoding): Maybe.IPerhaps<Protocol.Incoming[]> {
+    protected m_transform(chunk: Buffer, encoding: BufferEncoding): Monads.Maybe<Protocol.Incoming[]> {
         this.m_resetTimeout(); // reset the current transform time-out
         this.m_buffer = Buffer.concat([this.m_buffer, chunk]); // join the buffers
         const pushable: Protocol.Incoming[] = []; // incoming responses
@@ -153,13 +153,13 @@ export class RTU extends Client {
         } while (1);
 
         // and return the resulting items
-        return Maybe.Some(pushable);
+        return Monads.Some(pushable);
     }
 
     /** RTU Flusher. */
-    protected m_flush(): Maybe.IPerhaps<Protocol.Incoming[]> {
+    protected m_flush(): Monads.Maybe<Protocol.Incoming[]> {
         this.m_buffer = Buffer.alloc(0);
-        return Maybe.None();
+        return Monads.None();
     }
 
     /** Resets an internal timeout for flushing Modbus data. */

@@ -4,14 +4,15 @@ import { CreatePortOptions } from '@serialport/binding-mock';
 import { AutoDetectTypes } from '@serialport/bindings-cpp';
 import { DisconnectedError } from '@serialport/stream';
 
+/// Vendor Modules
+import * as Monads from 'ts-monadable';
+
 /// Ext-Port Utils
 import { Delay } from '../utils/delay';
 import { Emitter } from '../utils/emitter';
 
 /// Ext-Port Modules
 import { Protocol } from '../codec';
-import { Maybe } from '../utils/maybe';
-import { Monad } from '../utils/monad';
 import { IPortEvents } from './events';
 import { IParser } from '../parser/impl';
 import { IPortOptions, DefaultPortOptions, IPortUpdateOptions } from './options';
@@ -30,15 +31,15 @@ export interface IBarePort {
     readonly baudRate: number;
     readonly isOpen: boolean;
 
-    open: () => Promise<Monad.IResult<void, string>>;
-    close: () => Promise<Monad.IResult<void, string>>;
+    open: () => Promise<Monads.Maybe<string>>;
+    close: () => Promise<Monads.Maybe<string>>;
     sleep: <T = void>(duration: number, next?: T) => Promise<T>;
 }
 
 /** Basic Port Interface (with events). */
 export interface IPort<P extends Protocol.Any = Protocol.Default> extends IBarePort, Emitter.ISimplex<IPortEvents<P>> {
     update: (opts: IPortUpdateOptions<P>) => void;
-    write: (...args: P['outgoing']) => Promise<Monad.IResult<void, string>>;
+    write: (...args: P['outgoing']) => Promise<Monads.Maybe<string>>;
 }
 
 /*****************
@@ -158,16 +159,16 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
      * Coordinates a write sequence for the underlying port instance.
      * @param args                              Arguments to decode to a suitable outgoing buffer.
      */
-    write(...args: P['outgoing']): Promise<Monad.IResult<void, string>> {
-        return new Promise<Monad.IResult<void, string>>((resolve) => {
+    write(...args: P['outgoing']): Promise<Monads.Maybe<string>> {
+        return new Promise<Monads.Maybe<string>>((resolve) => {
             // cast the outgoing arguments into a suitable buffer to use
-            const outgoing = this.m_parser?.codec.encode(...args) ?? Maybe.Some<Buffer>(args[0]);
+            const outgoing = this.m_parser?.codec.encode(...args) ?? Monads.Some<Buffer>(args[0]);
 
             // declare an error if we have an invalid message
             if (outgoing.is('none')) {
                 const message = `Could not write to ext::Port. ${outgoing.unwrap()}`;
                 this.m_emitter.emit('_error', PortError(message));
-                return resolve(Monad.Error(message));
+                return resolve(Monads.Some(message));
             }
 
             // update the required encoding
@@ -181,7 +182,7 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
             if (!(buffer instanceof Buffer)) {
                 const message = `Could not write to ext::Port. Outgoing data could not be converted to a buffer`;
                 this.m_emitter.emit('_error', PortError(message));
-                return resolve(Monad.Error(message));
+                return resolve(Monads.Some(message));
             }
 
             // everything is good, so write away
@@ -190,12 +191,12 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
                 if (err) {
                     const message = `ext::Port write error. ${err.message}`;
                     this.m_emitter.emit('_error', PortError(message));
-                    return resolve(Monad.Error(message));
+                    return resolve(Monads.Some(message));
                 }
 
                 // valid message, so resolve normally
                 this.m_emitter.emit('outgoing', buffer);
-                resolve(Monad.Void('okay'));
+                resolve(Monads.None());
             });
         });
     }
@@ -251,7 +252,7 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
      * @param state                         State to change to.
      */
     private m_toggle = (state: 'open' | 'close') =>
-        new Promise<Monad.IResult<void, string>>((resolve) => {
+        new Promise<Monads.Maybe<string>>((resolve) => {
             // determine the current state
             const current = this.m_port.isOpen ? 'open' : 'close';
 
@@ -259,7 +260,7 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
             if (state === current) {
                 const message = `ext::Port is already ${state === 'close' ? 'closed' : 'open'}`;
                 this.m_emitter.emit('_warning', PortWarning(message));
-                return resolve(Monad.Error(message));
+                return resolve(Monads.Some(message));
             }
 
             // otherwise attempt the required state change
@@ -267,12 +268,12 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
                 if (err) {
                     const message = `Could not change ext::Port state. ${err.message}`;
                     this.m_emitter.emit('_error', PortError(message));
-                    return resolve(Monad.Error(message));
+                    return resolve(Monads.Some(message));
                 }
 
                 // successfully changed state
                 this.m_emitter.emit(state, state === 'close' ? false : void 0);
-                resolve(Monad.Void('okay'));
+                resolve(Monads.None());
             });
         });
 
