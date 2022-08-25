@@ -91,7 +91,6 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
         if (this.m_port.isOpen) throw PortError('Cannot change ext::Port.parser whilst port is open');
 
         // remove the current parser implementation
-        this.m_port.unpipe();
         this.m_parser?.destroy();
 
         // update the desired state of the next parser
@@ -105,7 +104,9 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
         const emitter = this.m_parser ?? this.m_port;
 
         // and propagate any incoming data
-        emitter.on('data', (chunk) => this.m_emitter.emit('incoming', chunk));
+        emitter.on('data', (chunk) =>
+            this.m_emitter.emit('incoming', next.codec.bufferize ? next.codec.btoi(chunk) : chunk)
+        );
     }
 
     /******************

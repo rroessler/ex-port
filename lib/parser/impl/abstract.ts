@@ -14,8 +14,8 @@ import { Protocol } from '../../codec/protocol';
 export interface IParser<P extends Protocol.Any> extends Transform {
     readonly codec: Codec.ICodec<P>;
 
-    readonly _transform: (chunk: Buffer, encoding: BufferEncoding, callback: TransformCallback) => void;
     readonly _flush: (callback: TransformCallback) => void;
+    readonly _transform: (chunk: Buffer, encoding: BufferEncoding, callback: TransformCallback) => void;
 }
 
 /********************
@@ -48,9 +48,10 @@ export abstract class Abstract<P extends Protocol.Any = Protocol.Default> extend
      * @param callback                  Transform callback.
      */
     override _transform(chunk: Buffer, encoding: BufferEncoding, callback: TransformCallback) {
-        const result = this.m_transform(chunk, encoding); // call the user-defined method
-        if (result.is('some')) result.unwrap().forEach((data) => this.push(data)); // unwrap if data is available
-        callback(); // auto-call the transform callback
+        // call the user-defined transformation method
+        this.m_transform(chunk, encoding)
+            .map((result) => result.forEach((item) => this.push(this.codec.bufferize ? this.codec.itob(item) : item)))
+            .map(() => callback());
     }
 
     /**
@@ -58,9 +59,9 @@ export abstract class Abstract<P extends Protocol.Any = Protocol.Default> extend
      * @param callback                  Transform callback.
      */
     override _flush(callback: TransformCallback) {
-        const result = this.m_flush(); // call the user-defined method
-        if (result.is('some')) result.unwrap().forEach((data) => this.push(data)); // unwrap if data is available
-        callback(); // auto-call the transform callback
+        this.m_flush()
+            .map((result) => result.forEach((item) => this.push(this.codec.bufferize ? this.codec.itob(item) : item)))
+            .map(() => callback());
     }
 
     /*********************

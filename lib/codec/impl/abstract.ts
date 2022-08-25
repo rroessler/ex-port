@@ -8,9 +8,16 @@ import { Protocol } from '../protocol';
  *  TYPEDEFS  *
  **************/
 
-/** Codec Interface Agreement. */
-export interface ICodec<P extends Protocol.Any> {
+/** Available Codec */
+export interface IOptions {
+    readonly bufferize: boolean;
     readonly encoding: BufferEncoding;
+}
+
+/** Codec Interface Agreement. */
+export interface ICodec<P extends Protocol.Any> extends IOptions {
+    itob(input: P['incoming']): Buffer;
+    btoi(buffer: Buffer): P['incoming'];
     encode(...args: P['outgoing']): Monads.Maybe<Buffer>;
     decode(buffer: Buffer, encoding?: BufferEncoding): Monads.Maybe<P['incoming']>;
 }
@@ -26,15 +33,24 @@ export interface ICodecConstructor<P extends Protocol.Any> {
 
 /** Base Codec Declaration. */
 export abstract class Abstract<P extends Protocol.Any = Protocol.Default> implements ICodec<P> {
+    /****************
+     *  PROPERTIES  *
+     ****************/
+
+    readonly bufferize: boolean = false; // Internal flag for bufferizing incoming data.
+    readonly encoding: BufferEncoding = 'binary'; // Denotes the encoding to use.
+
     /*****************
      *  CONSTRUCTOR  *
      *****************/
 
     /**
      * Constructs a Codec abstraction with a desired outgoing encoding.
-     * @param encoding                      Encoding to target.
+     * @param options                               Codec Options.
      */
-    constructor(public readonly encoding: BufferEncoding = 'binary') {}
+    constructor(readonly options: Partial<IOptions> = {}) {
+        Object.assign(this, options); // update the internal options
+    }
 
     /********************
      *  PUBLIC METHODS  *
@@ -51,4 +67,21 @@ export abstract class Abstract<P extends Protocol.Any = Protocol.Default> implem
      * @param buffer                        Buffer to decode.
      */
     abstract decode(buffer: Buffer, encoding?: BufferEncoding): Monads.Maybe<P['incoming']>;
+
+    /**
+     * Converts a given input to a buffer.
+     * @param input                         Incoming data to bufferize.
+     */
+    itob(input: P['incoming']): Buffer {
+        if (<any>input instanceof Buffer) return input;
+        return Buffer.from(JSON.stringify(input));
+    }
+
+    /**
+     * Converts a buffer back into a desired incoming message.
+     * @param buffer                        Data to re-form.
+     */
+    btoi(buffer: Buffer): P['incoming'] {
+        return JSON.parse(buffer.toString());
+    }
 }
