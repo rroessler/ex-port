@@ -96,10 +96,6 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
         // update the desired state of the next parser
         this.m_parser = next ? this.m_port.pipe(next) : undefined;
 
-        // need to clear any potential data listeners
-        this.m_port.removeAllListeners('data');
-        this.m_parser?.removeAllListeners('data');
-
         // determine the most suitable data emitter
         const emitter = this.m_parser ?? this.m_port;
 
