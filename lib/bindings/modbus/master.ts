@@ -117,6 +117,9 @@ export class Master implements IBarePort, Pick<IClient, 'protocol' | 'target'> {
         const request = new Frames[name]('request', args as any);
         const current = this.target(); // set the current target
 
+        // wait until the previous requests are complete
+        while (this.m_outgoing.length) await this.sleep(0);
+
         // before continuing, throttle the request
         await this.sleep(this.m_options.throttle);
 
@@ -134,8 +137,15 @@ export class Master implements IBarePort, Pick<IClient, 'protocol' | 'target'> {
                 }, this.m_options.timeout);
 
                 // finally prepare the resolution condition
-                this.m_client.once('data', ({ target, response }: Protocol.Full['incoming']) => {
-                    if (current !== target) return;
+                this.m_client.once('data', (chunk: Buffer) => {
+                    // parse the incoming data buffer and clear the current timeout
+                    const { target, response }: Protocol.Full['incoming'] = this.m_client.codec.btoi(chunk);
+                    clearTimeout(timer);
+
+                    // and ensure that it is valid
+                    if (current !== target) return resolve(Monads.Failure(new Exception.Frame('response', -1)));
+
+                    // since valid, remove the outgoing request
                     this.m_outgoing.shift();
 
                     // determine if we have a valid or bad response and resolve accordingly

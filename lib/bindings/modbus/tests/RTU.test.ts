@@ -73,6 +73,7 @@ test('Bindings::Modbus::RTU | Transform incoming Modbus data', (t) => {
         t.assert(spy.callCount === ii + 1); // ensure valid call count
         const rbuf = spy.getCall(ii).args[0]; // get the response buffer
         const { target, response } = RTU.Codec.btoi(rbuf); // and decode
+        console.log({ response });
         t.deepEqual(target, address, 'Decoded invalid target address');
         t.deepEqual(response.name, frame.name, 'Non-equal Modbus frame type');
     });
