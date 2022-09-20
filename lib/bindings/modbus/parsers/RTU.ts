@@ -105,6 +105,9 @@ export class RTU extends Client {
     /** Internal flush timeout. */
     private m_timeout: NodeJS.Timeout = null as any;
 
+    /** Base Codec Instance. */
+    static Codec = new _Codec_impl({ bufferize: true });
+
     /*****************
      *  CONSTRUCTOR  *
      *****************/
@@ -115,7 +118,7 @@ export class RTU extends Client {
      */
     constructor(options: IRTU) {
         const { target, flushRate = 250, ...rest } = options;
-        super(target, 'RTU', new _Codec_impl(), rest); // inherit from the base client
+        super(target, 'RTU', RTU.Codec, rest); // inherit from the base client
 
         // set the internal flush-rate
         this.m_flushRate = flushRate;
@@ -150,7 +153,7 @@ export class RTU extends Client {
 
             // emit this response using the target and function code
             pushable.push({ response, target });
-        } while (1);
+        } while (this.m_buffer.length);
 
         // and return the resulting items
         return Monads.Some(pushable);

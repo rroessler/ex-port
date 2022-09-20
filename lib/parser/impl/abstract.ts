@@ -50,8 +50,8 @@ export abstract class Abstract<P extends Protocol.Any = Protocol.Default> extend
     override _transform(chunk: Buffer, encoding: BufferEncoding, callback: TransformCallback) {
         // call the user-defined transformation method
         this.m_transform(chunk, encoding)
-            .map((result) => result.forEach((item) => this.push(this.codec.bufferize ? this.codec.itob(item) : item)))
-            .map(() => callback());
+            .map((result) => result.map((item) => (this.codec.bufferize ? this.codec.itob(item) : (item as Buffer))))
+            .map((pushable) => (pushable.forEach((item) => this.push(item)), callback()));
     }
 
     /**
@@ -60,8 +60,8 @@ export abstract class Abstract<P extends Protocol.Any = Protocol.Default> extend
      */
     override _flush(callback: TransformCallback) {
         this.m_flush()
-            .map((result) => result.forEach((item) => this.push(this.codec.bufferize ? this.codec.itob(item) : item)))
-            .map(() => callback());
+            .map((result) => result.map((item) => (this.codec.bufferize ? this.codec.itob(item) : (item as Buffer))))
+            .map((pushable) => (pushable.forEach((item) => this.push(item)), callback()));
     }
 
     /*********************

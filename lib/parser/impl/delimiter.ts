@@ -67,8 +67,8 @@ export class Delimiter extends Abstract {
         let pos: number;
 
         while ((pos = data.indexOf(this.delim)) !== -1) {
-            pushable.push(data.slice(0, pos + (this.include ? this.delim.length : 0)));
-            data = data.slice(pos + this.delim.length);
+            pushable.push(data.subarray(0, pos + (this.include ? this.delim.length : 0)));
+            data = data.subarray(pos + this.delim.length);
         }
 
         this.m_buffer = data;
