@@ -73,7 +73,7 @@ Some examples for parsers can be seen in the `lib/parser/impl` directory, alongs
 
 ### Port Methods
 
-Most methods return a monadic result instead of required a designated callback handler. This allows for a simpler process (removing callback hell) of handling outcomes that may occur when changing state on a port instance.
+Most methods return a monadic result instead of required a designated callback handler. This allows for a simpler process (removing callback hell) of handling outcomes that may occur when changing state on a port instance. The library to coordinate this is [`ts-monadable`](https://github.com/rroessler/ts-monadable).
 
 **`open`** &ndash; Opens a port instance. Returns a promisified monadic result.
 
@@ -82,7 +82,7 @@ import ext from 'ext-port';
 const port = new ext.Port({ path: '/dev/ROBOT', baudRate: 115200 });
 const result = await port.open();
 
-if (result.is('error')) /** Handle Error ... */
+if (result.is('some')) /** Handle Error ... */
 else /** Proceed as normal */
 ```
 
@@ -90,7 +90,7 @@ else /** Proceed as normal */
 
 ```typescript
 const result = await port.close();
-if (result.is('error')) console.log(result.unwrap());
+if (result.is('some')) console.log(result.unwrap());
 ```
 
 **`write`** &ndash; Writes to a port instance as defined by the protocol definition.
