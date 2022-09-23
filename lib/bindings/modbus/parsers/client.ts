@@ -63,7 +63,7 @@ export abstract class Client extends Parser.Abstract<Protocol.Full> implements I
      * @param next                      Optional next address.
      */
     target(next?: number) {
-        if (next) this.m_target = next;
+        if (next !== undefined) this.m_target = next;
         return this.m_target;
     }
 }

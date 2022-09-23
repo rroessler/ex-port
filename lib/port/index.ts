@@ -101,7 +101,7 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
 
         // and propagate any incoming data
         emitter.on('data', (chunk) =>
-            this.m_emitter.emit('incoming', next.codec.bufferize ? next.codec.btoi(chunk) : chunk)
+            this.m_emitter.emit('incoming', next?.codec.bufferize ? next.codec.btoi(chunk) : chunk)
         );
     }
 
@@ -163,7 +163,7 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
 
             // declare an error if we have an invalid message
             if (outgoing.is('none')) {
-                const message = `Could not write to ext::Port. ${outgoing.unwrap()}`;
+                const message = 'Could not write to ext::Port';
                 this.m_emitter.emit('_error', PortError(message));
                 return resolve(Monads.Some(message));
             }
@@ -240,6 +240,15 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
         return this.m_emitter.ignore(eventName, ...keys);
     }
 
+    /**
+     * Emits an event for the port.
+     * @param eventName                         Event name.
+     * @param args                              Arguments to emit.
+     */
+    emit<U extends keyof IPortEvents<P>>(eventName: U, ...args: IPortEvents<P>[U]) {
+        return this.m_emitter.emit(eventName, ...args);
+    }
+
     /*********************
      *  PRIVATE METHODS  *
      *********************/
@@ -269,7 +278,7 @@ abstract class Abstract<S extends SerialPort | SerialPortMock, P extends Protoco
                 }
 
                 // successfully changed state
-                this.m_emitter.emit(state, state === 'close' ? false : void 0);
+                this.m_emitter.emit(state, ...(state === 'close' ? [false] : []));
                 resolve(Monads.None());
             });
         });

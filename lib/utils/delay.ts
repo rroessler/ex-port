@@ -22,7 +22,7 @@ export namespace Delay {
      * @param duration                          Duration to sleep for.
      * @param next                              Optional pass-through value.
      */
-    export const sleep: ISleep = <T = void>(duration: number, next: T = void 0) => {
+    export const sleep: ISleep = <T = void>(duration: number, next: T = void 0 as unknown as T) => {
         m_assertDuration(duration);
         return new Promise<T>((resolve) => setTimeout(() => resolve(next), duration));
     };

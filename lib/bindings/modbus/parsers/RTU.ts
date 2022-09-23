@@ -137,7 +137,7 @@ export class RTU extends Client {
         this.m_resetTimeout(); // reset the current transform time-out
         this.m_buffer = Buffer.concat([this.m_buffer, chunk]); // join the buffers
         const pushable: Protocol.Incoming[] = []; // incoming responses
-
+        console.log(this.m_buffer);
         do {
             // attempt decoding the current buffer
             const result = this.codec.decode(this.m_buffer, encoding);

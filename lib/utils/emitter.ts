@@ -57,7 +57,7 @@ export namespace Emitter {
             const next = this.m_next();
 
             this.m_refs[eventName] ??= new Map();
-            this.m_refs[eventName].set(next, handler);
+            this.m_refs[eventName]?.set(next, handler);
 
             return next;
         }
@@ -72,7 +72,7 @@ export namespace Emitter {
             const next = this.m_next();
 
             this.m_refs[eventName] ??= new Map();
-            this.m_refs[eventName].set(next, handler);
+            this.m_refs[eventName]?.set(next, handler);
 
             return next;
         }
@@ -92,8 +92,8 @@ export namespace Emitter {
          * @param keys                              Optional handler keys.
          */
         ignore<U extends keyof T>(eventName: U, ...keys: bigint[]): number {
-            if (!keys.length) keys = [...this.m_refs[eventName].keys()];
-            keys.forEach((key) => this.m_refs[eventName].delete(key));
+            if (!keys.length) keys = [...(this.m_refs[eventName]?.keys() ?? [])];
+            keys.forEach((key) => this.m_refs[eventName]?.delete(key));
             return keys.length;
         }
     }

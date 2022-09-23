@@ -5,7 +5,7 @@ import * as Monads from 'ts-monadable';
 import { Delay } from '../../utils/delay';
 
 /// Ext-Port Imports
-import { IBarePort, IPortOptions, Port } from '../../port';
+import { IBarePort, IPortOptions, Port, PortError } from '../../port';
 
 /// Modbus Imports
 import { Protocol } from './protocol';
@@ -34,13 +34,10 @@ export class Master implements IBarePort, Pick<IClient, 'protocol' | 'target'> {
      ****************/
 
     /** Internal Master Options. */
-    private m_options: IMasterOptions = { timeout: 1000, throttle: 0 };
+    private m_options: Required<IMasterOptions> = { timeout: 1000, throttle: 0 };
 
     /** Underlying Port Instance. */
     readonly port: Port<Protocol.Full>;
-
-    /** Outgoing Requests. */
-    private m_outgoing: Promise<any>[] = [];
 
     /***********************
      *  GETTERS / SETTERS  *
@@ -63,7 +60,7 @@ export class Master implements IBarePort, Pick<IClient, 'protocol' | 'target'> {
 
     /** Gets the target manipulator. */
     get target() {
-        return this.m_client.target;
+        return this.m_client.target.bind(this.m_client);
     }
 
     /** Gets the Modbus protocol being used. */
@@ -83,6 +80,10 @@ export class Master implements IBarePort, Pick<IClient, 'protocol' | 'target'> {
     constructor(private m_client: IClient, options: IMasterOptions & IPortOptions<Protocol.Full>) {
         const { timeout, throttle, ...rest } = options; // destructure the required options
         this.port = new Port({ ...rest, parser: m_client }); // also assign the client as the parser
+
+        // assign the master options as necessary
+        if (timeout !== undefined) this.m_options.timeout = timeout;
+        if (throttle !== undefined) this.m_options.throttle = throttle;
     }
 
     /********************
@@ -117,9 +118,6 @@ export class Master implements IBarePort, Pick<IClient, 'protocol' | 'target'> {
         const request = new Frames[name]('request', args as any);
         const current = this.target(); // set the current target
 
-        // wait until the previous requests are complete
-        while (this.m_outgoing.length) await this.sleep(0);
-
         // before continuing, throttle the request
         await this.sleep(this.m_options.throttle);
 
@@ -132,7 +130,7 @@ export class Master implements IBarePort, Pick<IClient, 'protocol' | 'target'> {
                 // setup a timer to handler what occurs when the request times-out
                 const timer = setTimeout(() => {
                     this.m_client.removeAllListeners('data'); // remove all previous listeners
-                    this.m_outgoing.shift(); // and the current promise
+                    this.port.emit('_error', PortError('Modbus::Master::invoke timed out'));
                     resolve(Monads.Failure(new Exception.Frame('response', -1)));
                 }, this.m_options.timeout);
 
@@ -143,10 +141,11 @@ export class Master implements IBarePort, Pick<IClient, 'protocol' | 'target'> {
                     clearTimeout(timer);
 
                     // and ensure that it is valid
-                    if (current !== target) return resolve(Monads.Failure(new Exception.Frame('response', -1)));
-
-                    // since valid, remove the outgoing request
-                    this.m_outgoing.shift();
+                    if (current !== target) {
+                        const message = 'Modbus::Master::invoke received a mismatched target address';
+                        this.port.emit('_error', PortError(message));
+                        return resolve(Monads.Failure(new Exception.Frame('response', -1)));
+                    }
 
                     // determine if we have a valid or bad response and resolve accordingly
                     if (response.name !== 'exception') resolve(Monads.Okay(response as any));
