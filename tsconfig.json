@@ -1,0 +1,30 @@
+{
+    "include": ["lib"],
+    "exclude": ["dist", "node_modules", "typings"],
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "CommonJS",
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+
+        "strict": true,
+        "alwaysStrict": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictPropertyInitialization": false,
+
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+
+        "noImplicitAny": true,
+        "noImplicitOverride": true,
+
+        "isolatedModules": true,
+        "experimentalDecorators": true,
+
+        "rootDir": "lib",
+        "outDir": "dist",
+        "declaration": true,
+        "declarationDir": "typings"
+    }
+}

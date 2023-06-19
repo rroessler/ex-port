@@ -1,0 +1,9 @@
+# Test Outputs
+.nyc_output/
+
+# Build Outputs
+dist/
+typings/
+
+# Node Development
+node_modules/
