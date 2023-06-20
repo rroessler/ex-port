@@ -72,7 +72,7 @@ export abstract class Abstract<T extends Target, P extends Parser.Any | undefine
         this.m_instance = new factory(rest);
 
         // update the current parser value to be used
-        this.parser = parser as any;
+        this.parser = (typeof parser === 'undefined' ? undefined : this.m_instance.pipe(parser)) as any;
 
         // prepare all necessary event-listeners
         this.m_registerEventListeners();
@@ -146,8 +146,6 @@ export abstract class Abstract<T extends Target, P extends Parser.Any | undefine
         return new Promise<void>((resolve, reject) => {
             // convert the output into a suitable value
             const buffer = this.parser?.codec?.encode(output) ?? Buffer.from(output);
-
-            console.log('Writing:', buffer);
 
             // attempt writing the value necessary
             this.m_instance.write(buffer, 'binary', (error) => {

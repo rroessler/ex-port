@@ -82,7 +82,7 @@ export namespace Response {
      * @param error                             Exception code.
      */
     export const exception = (code: number, error: Code.Exception) =>
-        new Frame.Generic(Code.Function.EXCEPTION, Frame.Direction.RESPONSE, { code, error });
+        new Frame.Response(Code.Function.EXCEPTION, { code, error });
 
     //  IMPLEMENTATIONS  //
 
@@ -238,7 +238,7 @@ export namespace Response {
 
             // can successfully retrieve the status
             const values = Utils.Bytes.to(bool ? 'bool' : 'u16', buffer.subarray(1, 1 + count));
-            return new Frame.Generic(code, Frame.Direction.RESPONSE, { [bool ? 'status' : 'array']: values } as any);
+            return new Frame.Response(code, { [bool ? 'status' : 'array']: values } as any);
         }
 
         /**
@@ -255,10 +255,7 @@ export namespace Response {
             if (buffer.length !== 4) return exception(code, Code.Exception.DECODE_FAILURE);
             const address = buffer.readUInt16BE(0);
             const value = buffer.readUInt16BE(2);
-            return new Frame.Generic(code, Frame.Direction.RESPONSE, {
-                address,
-                value: bool ? value === 0xff00 : value,
-            } as any);
+            return new Frame.Response(code, { address, value: bool ? value === 0xff00 : value } as any);
         }
 
         /**
@@ -270,7 +267,7 @@ export namespace Response {
             if (buffer.length !== 4) return exception(code, Code.Exception.DECODE_FAILURE);
             const address = buffer.readUInt16BE(0);
             const quantity = buffer.readUInt16BE(2);
-            return new Frame.Generic(code, Frame.Direction.RESPONSE, { address, quantity } as any);
+            return new Frame.Response(code, { address, quantity } as any);
         }
     }
 }

@@ -82,7 +82,7 @@ export namespace Request {
      * @param error                             Exception code.
      */
     export const exception = (code: number, error: Code.Exception) =>
-        new Frame.Generic(Code.Function.EXCEPTION, Frame.Direction.REQUEST, { code, error });
+        new Frame.Request(Code.Function.EXCEPTION, { code, error });
 
     //  IMPLEMENTATIONS  //
 
@@ -222,7 +222,7 @@ export namespace Request {
             if (buffer.length !== 4) return exception(code, Code.Exception.DECODE_FAILURE);
             const start = buffer.readUInt16BE(0);
             const quantity = buffer.readUInt16BE(2);
-            return new Frame.Generic(code, Frame.Direction.REQUEST, { start, quantity } as any);
+            return new Frame.Request(code, { start, quantity } as any);
         }
 
         /**
@@ -239,10 +239,7 @@ export namespace Request {
             if (buffer.length !== 4) return exception(code, Code.Exception.DECODE_FAILURE);
             const start = buffer.readUInt16BE(0);
             const value = buffer.readUInt16BE(2);
-            return new Frame.Generic(code, Frame.Direction.REQUEST, {
-                start,
-                value: bool ? value === 0xff00 : value,
-            } as any);
+            return new Frame.Request(code, { start, value: bool ? value === 0xff00 : value } as any);
         }
 
         private m_array<C extends Code.Function>(
@@ -262,7 +259,7 @@ export namespace Request {
             // and construct the resulting details
             const values = buffer.subarray(5, 5 + count);
             const array = Utils.Bytes.to(bool ? 'bool' : 'u16', values);
-            return new Frame.Generic(code, Frame.Direction.REQUEST, { start, array } as any);
+            return new Frame.Request(code, { start, array } as any);
         }
     }
 }

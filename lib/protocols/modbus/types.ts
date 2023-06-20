@@ -11,15 +11,14 @@ export namespace Packet {
     /** Incoming Packet Interface. */
     export interface Incoming {
         readonly target: number;
-        readonly response: Frame.Generic<Code.Function, Frame.Direction.RESPONSE>;
+        readonly response: Frame.Response<Code.Function>;
     }
 
     /** Outgoing Packet Interface. */
     export interface Outgoing<E extends boolean = false> {
         readonly target: number;
-        readonly request: Frame.Generic<
-            E extends true ? Code.Function : Exclude<Code.Function, Code.Function.EXCEPTION>,
-            Frame.Direction.REQUEST
+        readonly request: Frame.Request<
+            E extends true ? Code.Function : Exclude<Code.Function, Code.Function.EXCEPTION>
         >;
     }
 

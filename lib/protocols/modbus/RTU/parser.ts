@@ -40,8 +40,6 @@ export class Parser extends __Parser__.Abstract<Packet, Codec> {
         this.m_buffer = Buffer.concat([this.m_buffer, chunk]);
         const pushable: Packet.Incoming[] = [];
 
-        console.log(this.m_buffer);
-
         do {
             // attempt decoding the current buffer instance
             const packet = this.m_codec.decode(this.m_buffer);

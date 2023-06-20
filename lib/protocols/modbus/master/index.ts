@@ -6,19 +6,25 @@ import { Port } from '../../../port';
 import { Codec } from '../../../codec';
 import { Parser } from '../../../parser';
 import { Exception } from '../exception';
+import { Draft } from '../draft';
 
 /** Modbus Master Implementation. */
-export class Master<P extends Parser.Abstract<Packet, Codec.Abstract<Packet>>> implements Port.Bare {
+export class Master<P extends Parser.Abstract<Packet, Codec.Abstract<Packet>>, D extends Draft.Any = Draft.Any>
+    implements Port.Bare
+{
     //  PROPERTIES  //
 
-    /** Master properties to use. */
-    private m_options: Required<Master.IOptions> = { threshold: 1000, throttle: 0 };
+    /** Underlying mapping details. */
+    private m_draft?: D;
 
     /** Explicit port instance. */
     private readonly m_port: Port.Stream<P>;
 
     /** Current pending invokation. */
-    private m_pending?: Promise<Frame.Generic<Code.Function, Frame.Direction.RESPONSE>>;
+    private m_pending?: Promise<Frame.Response<Code.Function>>;
+
+    /** Master properties to use. */
+    private m_options: Required<Omit<Master.IOptions<D>, 'draft'>> = { threshold: 1000, throttle: 0 };
 
     //  GETTERS x SETTERS  //
 
@@ -43,9 +49,12 @@ export class Master<P extends Parser.Abstract<Packet, Codec.Abstract<Packet>>> i
      * Constructs an instance of a Modbus Master.
      * @param options                       Options to use.
      */
-    constructor(options: Master.IOptions & Port.Options.Binding<P>) {
-        const { threshold, throttle, ...rest } = options;
+    constructor(options: Master.IOptions<D> & Port.Options.Binding<P>) {
+        const { draft, threshold, throttle, ...rest } = options;
         this.m_port = new Port.Stream(rest) as any;
+
+        // set the base draft to be used
+        this.m_draft = draft;
 
         // assign the underlying options as necessary
         if (typeof threshold === 'number') this.m_options.threshold = threshold;
@@ -69,15 +78,31 @@ export class Master<P extends Parser.Abstract<Packet, Codec.Abstract<Packet>>> i
         return this.m_port.close();
     }
 
-    //  PRIVATE METHODS  //
+    /**
+     * Makes a request for a mapped modbus-entry.
+     * @param options                           Options necessary.
+     */
+    async request<K extends keyof D>({
+        target,
+        key,
+        ...data
+    }: Draft.Options<D, K>): Promise<Frame.Response<D[K]['code']>['data']> {
+        // ensure we actually have a draft to use
+        if (typeof this.m_draft === 'undefined') throw new Error('Modbus::Draft not set');
+        if (!(key in this.m_draft)) throw new Error(`Modbus::Draft invalid key "${key.toString()}"`);
+
+        // get the necessary details to be used
+        const { code, ...preset } = this.m_draft[key];
+        return this.invoke(target, code as any, Object.assign({}, preset, data)).then((response) => response.data);
+    }
 
     /**
-     * Attempts invoking a desired modbus function.
+     * Attempts a raw-invokation for a desired modbus function.
      * @param target                            Target value.
      * @param code                              Function code.
      * @param data                              Data to emit.
      */
-    async m_invoke<C extends Exclude<Code.Function, Code.Function.EXCEPTION>>(
+    async invoke<C extends Exclude<Code.Function, Code.Function.EXCEPTION>>(
         target: number,
         code: C,
         data: Frame.Data.Request[C]
@@ -93,7 +118,7 @@ export class Master<P extends Parser.Abstract<Packet, Codec.Abstract<Packet>>> i
         }
 
         // generate the required frame to be invoked
-        const request = new Frame.Generic(code, Frame.Direction.REQUEST, data);
+        const request = new Frame.Request(code, data);
 
         // before continuing, delay execution if as necessary
         await new Promise<void>((resolve) => setTimeout(() => resolve(), this.m_options.throttle));
@@ -102,7 +127,7 @@ export class Master<P extends Parser.Abstract<Packet, Codec.Abstract<Packet>>> i
         await this.m_port.flush();
 
         // prepare the promise we require
-        const promise = new Promise<Frame.Generic<C, Frame.Direction.RESPONSE>>((resolve, reject) => {
+        const promise = new Promise<Frame.Response<C>>((resolve, reject) => {
             // prepare the listener necessary for resolution
             const listener = (packet: Packet.Incoming) => {
                 // clear the current timer instance
@@ -136,7 +161,8 @@ export namespace Master {
     //  TYPEDEFS  //
 
     /** Modbus Master Options Interface. */
-    export interface IOptions {
+    export interface IOptions<D extends Draft.Any> {
+        draft?: D;
         threshold?: number;
         throttle?: number;
     }
