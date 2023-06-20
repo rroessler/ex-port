@@ -12,7 +12,10 @@ export interface Facade<B extends Bus.Any> extends stream.Transform {
 }
 
 /** Parser Abstraction. */
-export abstract class Abstract<B extends Bus.Any> extends stream.Transform implements Facade<B> {
+export abstract class Abstract<B extends Bus.Any, C extends Codec.Abstract<B>>
+    extends stream.Transform
+    implements Facade<B>
+{
     //  GETTERS x SETTERS  //
 
     /** Gets the underlying codec instance. */
@@ -27,7 +30,7 @@ export abstract class Abstract<B extends Bus.Any> extends stream.Transform imple
      * @param m_codec                       Codec to use.
      * @param options                       Transform options.
      */
-    constructor(private readonly m_codec: Codec.Abstract<B>, options?: IOptions) {
+    constructor(protected readonly m_codec: C, options?: IOptions) {
         super(options);
     }
 

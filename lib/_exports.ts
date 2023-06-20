@@ -4,3 +4,4 @@ export * from './codec';
 export * from './parser';
 export * from './port';
 export * from './protocols';
+export * from './utils';

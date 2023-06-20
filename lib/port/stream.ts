@@ -7,7 +7,7 @@ import { Parser } from '../parser';
 import { Abstract } from './abstract';
 
 /** Mock Serial-Port Implementation. */
-export class Stream<P extends Parser.Any | undefined> extends Abstract<SerialPort, P> {
+export class Stream<P extends Parser.Any | undefined = undefined> extends Abstract<SerialPort, P> {
     //  CONSTRUCTORS  //
 
     /**

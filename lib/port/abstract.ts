@@ -1,5 +1,5 @@
 /// Node Modules
-import EventEmitter from 'events';
+import EventEmitter from 'node:events';
 
 /// Vendor Modules
 import TypedEmitter from 'typed-emitter';
@@ -7,12 +7,13 @@ import { DisconnectedError } from '@serialport/stream';
 
 /// Package Modules
 import { Bus } from '../bus';
+import { Bare } from './bare';
 import { Parser } from '../parser';
 import { IEvents } from './events';
 import { Options, Target } from './types';
 
 /** Port-Stream Abstraction. */
-export abstract class Abstract<T extends Target, P extends Parser.Any | undefined> {
+export abstract class Abstract<T extends Target, P extends Parser.Any | undefined> implements Bare {
     //  PROPERTIES  //
 
     /** Wrapped Port Instance. */
@@ -86,7 +87,7 @@ export abstract class Abstract<T extends Target, P extends Parser.Any | undefine
     //  PUBLIC METHODS  //
 
     /** Handles safely opening the port-abstraction. */
-    open() {
+    async open() {
         // if already open, then declare a warning
         if (this.isOpen) return void this.m_emitter.emit('_warning', `Port "${this.path}" is already opened`);
 
@@ -103,7 +104,7 @@ export abstract class Abstract<T extends Target, P extends Parser.Any | undefine
     }
 
     /** Handles safely closing the port-abstraction. */
-    close() {
+    async close() {
         // regardless of the state, always attempt to close
         return new Promise<void>((resolve, reject) =>
             this.m_instance.close((error) => {
@@ -145,6 +146,8 @@ export abstract class Abstract<T extends Target, P extends Parser.Any | undefine
         return new Promise<void>((resolve, reject) => {
             // convert the output into a suitable value
             const buffer = this.parser?.codec?.encode(output) ?? Buffer.from(output);
+
+            console.log('Writing:', buffer);
 
             // attempt writing the value necessary
             this.m_instance.write(buffer, 'binary', (error) => {

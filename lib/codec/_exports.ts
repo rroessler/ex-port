@@ -1,5 +1,7 @@
 /// Codec Exports
-export * from './abstract';
+export * from './merge';
+export * from './complex';
 export * from './options';
-export * from './pass-through';
+export * from './abstract';
 export * from './primitive';
+export * from './pass-through';
