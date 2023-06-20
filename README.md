@@ -16,7 +16,7 @@ As a wrapper-utility, `ext-port` allows defining typed parsers for a chosen seri
 
 ### Port Stream
 
-By default, the `Ext.Port.Stream` will act similarly to the (`serialport::SerialPort`)[https://github.com/serialport/node-serialport] implementation. When instantiated as below, the port defaults to an `Ext.Bus<Buffer, Buffer>` protocol that expects stream data to be incoming and outgoing as buffers.
+By default, the `Ext.Port.Stream` will act similarly to the [`serialport::SerialPort`](https://github.com/serialport/node-serialport) implementation. When instantiated as below, the port defaults to an `Ext.Bus<Buffer, Buffer>` protocol that expects stream data to be incoming and outgoing as buffers.
 
 ```typescript
 import { Ext } from 'ext-port';
@@ -66,7 +66,7 @@ port.on('incoming', (chunk: string) => /** ... */); // port event-data
 port.on('outgoing', (chunk: string) => /** ... */); // written buffer
 ```
 
-This allows us to construct complex transform-streams with ease. Alongside this, an `Ext.Codec` can be attached to an `Ext.Parser.Abstract` to define `encode`, `decode`, `serialize` and `deserialize` properties for parsing. This is useful when transforming to/from (complex data-types)[#defining-a-codec].
+This allows us to construct complex transform-streams with ease. Alongside this, an `Ext.Codec` can be attached to an `Ext.Parser.Abstract` to define `encode`, `decode`, `serialize` and `deserialize` properties for parsing. This is useful when transforming to/from [complex data-types](#defining-a-codec).
 
 **Note:** All the base parsers from `serialport` can be placed as the `parser` option as well. This library was designed around this functionality and extending transform streams to simplify using this library as a wrapper over the `serialport` functionality.
 
@@ -84,7 +84,7 @@ Codecs can be created by extending any of the `Ext.Codec` abstractions. These in
 
 The primary purpose of this library is to help defining common protocols (with data-transformations). This could be useful for parsing GPS or Modbus as examples. The following have been implemented for users.
 
--   [Modbus](lib/protocols/README.md)
+-   [Modbus](lib/protocols/modbus/README.md)
 
 ## License
 
