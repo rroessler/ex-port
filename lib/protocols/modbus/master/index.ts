@@ -126,34 +126,35 @@ export class Master<P extends Parser.Abstract<Packet, Codec.Abstract<Packet>>, D
         // pre-flush the client before writing
         await this.m_port.flush();
 
-        // prepare the promise we require
-        const promise = new Promise<Frame.Response<C>>((resolve, reject) => {
-            // prepare the listener necessary for resolution
-            const listener = (packet: Packet.Incoming) => {
-                // clear the current timer instance
-                clearTimeout(timer);
+        // prepare a deferred promise instance
+        const deferred: { promise: Promise<Frame.Response<C>>; resolve: Function; reject: Function } = {} as any;
+        deferred.promise = new Promise((resolve, reject) => ((deferred.resolve = resolve), (deferred.reject = reject)));
 
-                // ensure we actually have a valid packet
-                Packet.invalid(packet)
-                    ? reject(new Exception(packet.response.data as any))
-                    : resolve(packet.response as any);
-            };
+        // and prepare a timer to be used
+        const timer = setTimeout(() => {
+            this.m_port.off('incoming', listener); // remove the listener instance
+            deferred.reject(new Exception({ code: -1, error: Code.Exception.NO_RESPONSE }));
+        }, this.m_options.threshold);
 
-            // and prepare a timer to be used
-            const timer = setTimeout(() => {
-                this.m_port.off('incoming', listener); // remove the listener instance
-                reject(new Exception({ code: -1, error: Code.Exception.NO_RESPONSE }));
-            }, this.m_options.threshold);
+        // prepare the listener necessary for resolution
+        const listener = (packet: Packet.Incoming) => {
+            // clear the current timer instance
+            clearTimeout(timer);
 
-            // attach the listener for execution
-            this.m_port.once('incoming', listener);
-        });
+            // ensure we actually have a valid packet
+            Packet.invalid(packet)
+                ? deferred.reject(new Exception(packet.response.data as any))
+                : deferred.resolve(packet.response as any);
+        };
 
-        // latch the promise value now
-        this.m_pending = promise;
+        // attach the listener for execution
+        this.m_port.once('incoming', listener);
 
-        // append the request to be resolved
-        return this.m_port.write({ target, request }).then(() => promise);
+        // run the write request now (do not await, we want it to run later)
+        this.m_port.write({ target, request }).catch((error) => deferred.reject(error));
+
+        // latch and return the promise value now
+        return (this.m_pending = deferred.promise);
     }
 }
 
