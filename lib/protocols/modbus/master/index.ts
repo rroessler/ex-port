@@ -20,8 +20,8 @@ export class Master<P extends Parser.Abstract<Packet, Codec.Abstract<Packet>>, D
     /** Explicit port instance. */
     private readonly m_port: Port.Stream<P>;
 
-    /** Current pending invokation. */
-    private m_pending?: Promise<Frame.Response<Code.Function>>;
+    /** Underlying promise queue. */
+    private m_pending = Promise.resolve();
 
     /** Master properties to use. */
     private m_options: Required<Omit<Master.IOptions<D>, 'draft'>> = { threshold: 1000, throttle: 0 };
@@ -110,21 +110,46 @@ export class Master<P extends Parser.Abstract<Packet, Codec.Abstract<Packet>>, D
         // ensure the target is a valid Modbus target
         if (target < 0 || target > 0xff) throw new Error(`Invalid Modbus target value`);
 
-        // wait for the current invokation to finish
-        await this.m_pending?.finally(() => (this.m_pending = undefined));
-
         // generate the required frame to be invoked
         const request = new Frame.Request(code, data);
 
-        // before continuing, delay execution if as necessary
+        // attempt waiting for this instance to finish now
+        return this.m_enqueue(target, request);
+    }
+
+    //  PRIVATE METHODS  //
+
+    /**
+     * Handles enqueuing a desired request.
+     * @param target                    Target to request.
+     * @param request                   Request packet to send.
+     */
+    private m_enqueue<C extends Exclude<Code.Function, Code.Function.EXCEPTION>>(
+        target: number,
+        request: Frame.Request<C>
+    ) {
+        return new Promise<Frame.Response<C>>((resolve, reject) => {
+            this.m_pending = this.m_pending
+                .then(() => this.m_invoke(target, request))
+                .then(resolve)
+                .catch(reject);
+        });
+    }
+
+    /**
+     * Handles internal invocation.
+     * @param target                    Target to request.
+     * @param request                   Request packet to send.
+     */
+    private async m_invoke<C extends Exclude<Code.Function, Code.Function.EXCEPTION>>(
+        target: number,
+        request: Frame.Request<C>
+    ) {
+        // before continuing, delay execution if necessary to do so
         await new Promise<void>((resolve) => setTimeout(() => resolve(), this.m_options.throttle));
 
-        // pre-flush the client before writing
-        await this.m_port.flush();
-
         // prepare a deferred promise instance
-        const deferred: { promise: Promise<Frame.Response<C>>; resolve: Function; reject: Function } = {} as any;
-        deferred.promise = new Promise((resolve, reject) => ((deferred.resolve = resolve), (deferred.reject = reject)));
+        const deferred = this.m_defer<C>();
 
         // and prepare a timer to be used
         const timer = setTimeout(() => {
@@ -143,6 +168,9 @@ export class Master<P extends Parser.Abstract<Packet, Codec.Abstract<Packet>>, D
                 : deferred.resolve(packet.response as any);
         };
 
+        // pre-flush the client before writing
+        await this.m_port.flush();
+
         // attach the listener for execution
         this.m_port.once('incoming', listener);
 
@@ -150,7 +178,18 @@ export class Master<P extends Parser.Abstract<Packet, Codec.Abstract<Packet>>, D
         this.m_port.write({ target, request }).catch((error) => deferred.reject(error));
 
         // latch and return the promise value now
-        return (this.m_pending = deferred.promise);
+        return deferred.promise;
+    }
+
+    /** Constructs a deferred promise. */
+    private m_defer<C extends Exclude<Code.Function, Code.Function.EXCEPTION>>(): {
+        promise: Promise<Frame.Response<C>>;
+        resolve: Function;
+        reject: Function;
+    } {
+        const deferred = Object.create(null); // prepare the result object to bind to
+        deferred.promise = new Promise((resolve, reject) => ((deferred.resolve = resolve), (deferred.reject = reject)));
+        return deferred; // and return the resulting deferred details now
     }
 }
 

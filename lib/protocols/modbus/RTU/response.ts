@@ -55,6 +55,10 @@ export class Response extends Codec.Complex<Bus.Simplex<Packet.Incoming>> {
         const code = buffer.readUInt8(1);
         const PDU = buffer.subarray(2, -2);
 
+        // validate the incoming length expected
+        if (!this.m_decoder.sizeof(code, PDU))
+            return { target, response: Response.exception(code, Code.Exception.DECODE_FAILURE) };
+
         // check for validation codes
         const exception = code > 0x80;
 
@@ -214,6 +218,25 @@ export namespace Response {
 
         [Code.Function.WRITE_MULTIPLE_REGISTERS](code: Code.Function.WRITE_MULTIPLE_REGISTERS, buffer: Buffer) {
             return this.m_multi(code, buffer);
+        }
+
+        /**
+         * Validates incoming response code sizes.
+         * @param code                                  Function code.
+         * @param data                                  Data to validate.
+         */
+        sizeof(code: Code.Function, data: Buffer): boolean {
+            switch (code) {
+                case Code.Function.READ_COILS:
+                case Code.Function.READ_DISCRETE_INPUTS:
+                case Code.Function.READ_HOLDING_REGISTERS:
+                case Code.Function.READ_INPUT_REGISTERS: {
+                    if (data.length < 1) return false;
+                    return data.length === 1 + data.readUInt8(0);
+                }
+
+                default: return data.length === 4; // prettier-ignore
+            }
         }
 
         //  PRIVATE METHODS  //

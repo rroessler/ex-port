@@ -1,6 +1,6 @@
 /// Package Modules
 import { Code } from '../code';
-import { Generic } from './generic';
+import { Generic, Request, Response } from './generic';
 
 //  TYPEDEFS  //
 
@@ -67,13 +67,52 @@ export namespace Data {
 export namespace Codec {
     //  TYPEDEFS  //
 
+    /** Size Abstraction. */
+    export interface Validator {
+        sizeof(code: Code.Function, data: Buffer): boolean;
+    }
+
     /** Encoder Abstraction. */
     export type Encoder<D extends Direction> = {
         [C in Code.Function]: (frame: Generic<C, D>) => Buffer;
     };
 
     /** Decoder Abstraction. */
-    export type Decoder<D extends Direction> = {
+    export type Decoder<D extends Direction> = Validator & {
         [C in Code.Function]: (code: C, buffer: Buffer) => Generic<C | Code.Function.EXCEPTION, D>;
     };
+
+    //  PUBLIC METHODS  //
+
+    /**
+     * Validates request frames.
+     * @param frame                 Frame to check.
+     * @param code                  Optional code.
+     */
+    export function request(frame: Generic<Code.Function, Direction>): frame is Request<Code.Function>;
+    export function request<C extends Code.Function>(
+        frame: Generic<Code.Function, Direction>,
+        code: C
+    ): frame is Request<C>;
+
+    /// [Implementation]
+    export function request(frame: Generic<Code.Function, Direction>, code?: Code.Function): boolean {
+        return frame instanceof Request && (typeof code === 'undefined' || frame.code === code);
+    }
+
+    /**
+     * Validates response frames.
+     * @param frame                 Frame to check.
+     * @param code                  Optional code.
+     */
+    export function response(frame: Generic<Code.Function, Direction>): frame is Response<Code.Function>;
+    export function response<C extends Code.Function>(
+        frame: Generic<Code.Function, Direction>,
+        code: C
+    ): frame is Response<C>;
+
+    /// [Implementation]
+    export function response(frame: Generic<Code.Function, Direction>, code?: Code.Function): boolean {
+        return frame instanceof Response && (typeof code === 'undefined' || frame.code === code);
+    }
 }

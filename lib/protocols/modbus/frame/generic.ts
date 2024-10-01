@@ -1,6 +1,6 @@
 /// Package Modules
-import { Code } from '../code';
-import { Data, Direction } from './types';
+import type { Code } from '../code';
+import type { Data, Direction } from './types';
 
 //  IMPLEMENTATIONS  //
 

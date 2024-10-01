@@ -1,8 +1,8 @@
 /** Available Exception Codes. */
 export const enum Exception {
     // internal failure codes
-    INVALID_CRC = -3,
-    DECODE_FAILURE = -2,
+    DECODE_FAILURE = -3,
+    INVALID_CRC = -2,
     NO_RESPONSE = -1,
 
     // explicit modbus codes

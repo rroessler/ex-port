@@ -31,6 +31,6 @@ export namespace Packet {
     export const invalid = <P extends Incoming | Outgoing>(packet: P) => {
         if ('request' in packet && <any>packet.request.code === Code.Function.EXCEPTION) return true;
         if ('response' in packet && packet.response.code === Code.Function.EXCEPTION) return true;
-        return packet.target === -1;
+        return packet.target === -1; // declared as currently invalid now
     };
 }

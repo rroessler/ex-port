@@ -2,6 +2,4 @@
 import stream from 'node:stream';
 
 /** RTU Parser Options. */
-export interface IOptions extends stream.TransformOptions {
-    flushRate?: number;
-}
+export interface IOptions extends stream.TransformOptions {}

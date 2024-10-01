@@ -55,6 +55,10 @@ export class Request extends Codec.Complex<Bus<Packet.Outgoing<true>, Packet.Out
         const code = buffer.readUInt8(1);
         const PDU = buffer.subarray(2, -2);
 
+        // ensure we validate our details now
+        if (!this.m_decoder.sizeof(code, PDU))
+            return { target, request: Request.exception(code, Code.Exception.DECODE_FAILURE) };
+
         // ensure the crc is valid for the payload
         const crc = buffer.readUInt16LE(buffer.length - 2);
         const invalid = __crc__(buffer.subarray(0, -2)) !== crc;
@@ -209,6 +213,23 @@ export namespace Request {
 
         [Code.Function.WRITE_MULTIPLE_REGISTERS](code: Code.Function.WRITE_MULTIPLE_REGISTERS, buffer: Buffer) {
             return this.m_array(code, buffer, false);
+        }
+
+        /**
+         * Validates incoming request code sizes.
+         * @param code                                  Function code.
+         * @param data                                  Data to validate.
+         */
+        sizeof(code: Code.Function, data: Buffer): boolean {
+            switch (code) {
+                case Code.Function.WRITE_MULTIPLE_COILS:
+                case Code.Function.WRITE_MULTIPLE_REGISTERS: {
+                    if (data.length < 5) return false;
+                    return data.length === 5 + data.readUInt8(4);
+                }
+
+                default: return data.length === 4; // prettier-ignore
+            }
         }
 
         //  PRIVATE METHODS  //
