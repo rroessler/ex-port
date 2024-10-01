@@ -1,12 +1,12 @@
 /// Package Modules
 import { Code } from '../code';
+import { Draft } from '../draft';
 import { Frame } from '../frame';
 import { Packet } from '../types';
 import { Port } from '../../../port';
 import { Codec } from '../../../codec';
 import { Parser } from '../../../parser';
 import { Exception } from '../exception';
-import { Draft } from '../draft';
 
 /** Modbus Master Implementation. */
 export class Master<P extends Parser.Abstract<Packet, Codec.Abstract<Packet>>, D extends Draft.Any = Draft.Any>
@@ -111,11 +111,7 @@ export class Master<P extends Parser.Abstract<Packet, Codec.Abstract<Packet>>, D
         if (target < 0 || target > 0xff) throw new Error(`Invalid Modbus target value`);
 
         // wait for the current invokation to finish
-        try {
-            await this.m_pending;
-        } finally {
-            this.m_pending = undefined;
-        }
+        await this.m_pending?.finally(() => (this.m_pending = undefined));
 
         // generate the required frame to be invoked
         const request = new Frame.Request(code, data);

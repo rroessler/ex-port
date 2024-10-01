@@ -5,6 +5,7 @@ export namespace Bytes {
     /** Internal Cast Mapping. */
     export interface Cast {
         readonly bool: boolean[];
+        readonly i16: number[];
         readonly u16: number[];
     }
 
@@ -30,6 +31,11 @@ export namespace Bytes {
             return out;
         },
 
+        i16: (buffer, endianess = 'BE') => {
+            const buf = Buffer.from(buffer);
+            return m_range(0, buf.length, 2).map((ii) => buf[`readInt16${endianess}`](ii));
+        },
+
         u16: (buffer, endianess = 'BE') => {
             const buf = Buffer.from(buffer);
             return m_range(0, buf.length, 2).map((ii) => buf[`readUint16${endianess}`](ii));
@@ -50,6 +56,12 @@ export namespace Bytes {
                 buf.writeUint8(byte, o8);
             }
 
+            return buf;
+        },
+
+        i16: (value, endianess = 'BE') => {
+            const buf = Buffer.alloc(value.length * 2);
+            value.forEach((v, ii) => buf[`writeInt16${endianess}`](v & 0xffff, ii * 2));
             return buf;
         },
 

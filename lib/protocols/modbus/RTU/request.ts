@@ -242,6 +242,12 @@ export namespace Request {
             return new Frame.Request(code, { start, value: bool ? value === 0xff00 : value } as any);
         }
 
+        /**
+         * Handles incoming array values.
+         * @param code                                  Function code.
+         * @param buffer                                Buffer to decode.
+         * @param bool                                  Expect boolean flag.
+         */
         private m_array<C extends Code.Function>(
             code: C,
             buffer: Buffer,
@@ -250,8 +256,8 @@ export namespace Request {
             // ensure we have a valid initial length
             if (buffer.length < 5) return exception(code, Code.Exception.DECODE_FAILURE);
 
-            const start = buffer.readUInt16BE(0);
             const count = buffer.readUInt8(4);
+            const start = buffer.readUInt16BE(0);
 
             // ensure the buffer is now fully formed
             if (buffer.length !== 5 + count) return exception(code, Code.Exception.DECODE_FAILURE);
